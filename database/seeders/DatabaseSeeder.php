@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,14 +11,15 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     * Thứ tự quan trọng: phải seed đúng thứ tự FK dependency.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            UserSeeder::class,       // 1. Users trước (FK gốc)
+            CategorySeeder::class,   // 2. Categories (Product phụ thuộc)
+            ProductSeeder::class,    // 3. Products + ProductImages
+            CouponSeeder::class,     // 4. Coupons (không phụ thuộc gì)
         ]);
     }
 }
