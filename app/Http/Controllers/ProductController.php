@@ -54,6 +54,10 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
+        if ($product->status !== 'active') {
+            abort(404);
+        }
+
         $product->load('category', 'images');
         $relatedProducts = Product::with('category')
             ->where('category_id', $product->category_id)
