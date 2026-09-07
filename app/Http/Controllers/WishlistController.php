@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Models\WishlistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,11 +12,15 @@ class WishlistController extends Controller
 {
     public function index()
     {
-        $products = Product::whereHas('wishlistedBy', function ($q) {
-            $q->where('user_id', Auth::id());
-        })->latest()->paginate(12);
+        $wishlist = Auth::user()->wishlist;
 
-        $wishlistIds = Auth::user()->wishlists()->pluck('product_id')->toArray();
+        $productIds = $wishlist ? $wishlist->items()->pluck('product_id')->toArray() : [];
+
+        $wishlistIds = $productIds;
+
+        $products = count($productIds)
+            ? Product::whereIn('id', $productIds)->with('category', 'images')->latest()->paginate(12)
+            : collect([]);
 
         return view('pages.wishlist', compact('products', 'wishlistIds'));
     }
@@ -23,7 +28,9 @@ class WishlistController extends Controller
     public function toggle(Request $request, Product $product)
     {
         $user = Auth::user();
-        $exists = Wishlist::where('user_id', $user->id)
+        $wishlist = $user->wishlist ?? $user->wishlist()->create(['user_id' => $user->id]);
+
+        $exists = WishlistItem::where('wishlist_id', $wishlist->id)
             ->where('product_id', $product->id)
             ->first();
 
@@ -32,18 +39,18 @@ class WishlistController extends Controller
             $isWishlisted = false;
             $message = 'Đã bỏ yêu thích';
         } else {
-            Wishlist::create([
-                'user_id' => $user->id,
-                'product_id' => $product->id,
+            WishlistItem::create([
+                'wishlist_id' => $wishlist->id,
+                'product_id'  => $product->id,
             ]);
             $isWishlisted = true;
             $message = 'Đã thêm vào yêu thích';
         }
 
         return response()->json([
-            'success' => true,
+            'success'       => true,
             'is_wishlisted' => $isWishlisted,
-            'message' => $message,
+            'message'       => $message,
         ]);
     }
 }
