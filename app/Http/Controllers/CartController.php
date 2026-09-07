@@ -2,120 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\CartException;
-use App\Http\Requests\Cart\AddToCartRequest;
-use App\Http\Requests\Cart\UpdateCartRequest;
-use App\Services\Cart\CartService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 class CartController extends Controller
 {
-    public function __construct(
-        private CartService $cartService
-    ) {}
-
-    /**
-     * Trang giỏ hàng.
-     *
-     * @group Cart
-     * @authenticated
-     */
-    public function index(): View
+    public function index()
     {
-        $cart = $this->cartService->getCartWithItems(auth()->id());
+        $cartItems = Cart::getContent();
+        $cartTotal = Cart::getTotal();
 
-        return view('cart.index', compact('cart'));
+        return view('cart.index', compact('cartItems', 'cartTotal'));
     }
 
-    /**
-     * Thêm sản phẩm vào giỏ.
-     *
-     * Nếu sản phẩm đã có trong giỏ, số lượng sẽ được cộng dồn.
-     *
-     * @group Cart
-     * @authenticated
-     *
-     * @bodyParam product_id int required ID của sản phẩm. Example: 1
-     * @bodyParam quantity int required Số lượng muốn thêm. Example: 2
-     *
-     * @response 200 {"message": "Đã thêm sản phẩm vào giỏ hàng.", "cart_count": 3}
-     * @response 422 {"message": "Sản phẩm \"Áo thun\" chỉ còn 1 trong kho."}
-     */
-    public function store(AddToCartRequest $request): JsonResponse
+    public function add(Request $request)
     {
-        try {
-            $this->cartService->addItem(
-                auth()->id(),
-                $request->integer('product_id'),
-                $request->integer('quantity', 1)
-            );
+        $product = \App\Models\Product::with('images')->findOrFail($request->product_id);
 
-            $cartCount = $this->cartService->getItemCount(auth()->id());
-
-            return response()->json([
-                'message'    => 'Đã thêm sản phẩm vào giỏ hàng.',
-                'cart_count' => $cartCount,
-            ]);
-        } catch (CartException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    }
-
-    /**
-     * Cập nhật số lượng sản phẩm trong giỏ.
-     *
-     * @group Cart
-     * @authenticated
-     *
-     * @urlParam cartItem int required ID của CartItem. Example: 5
-     * @bodyParam quantity int required Số lượng mới. Example: 3
-     *
-     * @response 200 {"message": "Đã cập nhật giỏ hàng.", "subtotal": 150000, "cart_total": 450000}
-     * @response 422 {"message": "Sản phẩm \"Áo thun\" chỉ còn 1 trong kho."}
-     */
-    public function update(UpdateCartRequest $request, int $cartItem): JsonResponse
-    {
-        try {
-            $item = $this->cartService->updateItem(
-                auth()->id(),
-                $cartItem,
-                $request->integer('quantity')
-            );
-
-            $cart = $this->cartService->getCartWithItems(auth()->id());
-
-            return response()->json([
-                'message'    => 'Đã cập nhật giỏ hàng.',
-                'subtotal'   => $item->subtotal(),
-                'cart_total' => $cart->totalPrice(),
-                'cart_count' => $cart->totalItems(),
-            ]);
-        } catch (CartException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    }
-
-    /**
-     * Xóa 1 sản phẩm khỏi giỏ hàng.
-     *
-     * @group Cart
-     * @authenticated
-     *
-     * @urlParam cartItem int required ID của CartItem. Example: 5
-     *
-     * @response 200 {"message": "Đã xóa sản phẩm khỏi giỏ hàng.", "cart_count": 2}
-     */
-    public function destroy(int $cartItem): JsonResponse
-    {
-        $this->cartService->removeItem(auth()->id(), $cartItem);
-
-        $cartCount = $this->cartService->getItemCount(auth()->id());
-
-        return response()->json([
-            'message'    => 'Đã xóa sản phẩm khỏi giỏ hàng.',
-            'cart_count' => $cartCount,
+        Cart::add([
+            'id' => $product->id,
+            'name' => $product->name,
+            'quantity' => $request->quantity ?? 1,
+            'price' => $product->sale_price ?? $product->price,
+            'attributes' => [
+                'image' => $product->image_url,
+                'slug' => $product->slug,
+            ],
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'cartCount' => Cart::getTotalQuantity(),
+            ]);
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+    }
+
+    public function update(Request $request)
+    {
+        Cart::update($request->rowId, ['quantity' => $request->quantity]);
+
+        return redirect()->route('cart.index')->with('success', 'Cập nhật giỏ hàng thành công!');
+    }
+
+    public function remove(Request $request)
+    {
+        Cart::remove($request->rowId);
+
+        return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+    }
+
+    public function clear()
+    {
+        Cart::clear();
+
+        return redirect()->route('cart.index')->with('success', 'Đã xóa toàn bộ giỏ hàng!');
+    }
+
+    public function checkout()
+    {
+        $cartItems = Cart::getContent();
+        $cartTotal = Cart::getTotal();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
+        }
+
+        return view('checkout.index', compact('cartItems', 'cartTotal'));
     }
 }

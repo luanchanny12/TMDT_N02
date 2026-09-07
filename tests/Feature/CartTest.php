@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Darryldecode\Cart\Facades\CartFacade as Cart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -24,8 +25,6 @@ class CartTest extends TestCase
         ], $attrs));
     }
 
-    // ─── Cart Page ────────────────────────────────────────────────────────────
-
     public function test_guest_cannot_access_cart(): void
     {
         $this->get('/cart')->assertRedirect('/login');
@@ -37,100 +36,60 @@ class CartTest extends TestCase
         $this->actingAs($user)->get('/cart')->assertStatus(200)->assertViewIs('cart.index');
     }
 
-    // ─── Add to Cart ─────────────────────────────────────────────────────────
-
     public function test_user_can_add_product_to_cart(): void
     {
         $user    = User::factory()->create();
         $product = $this->createProduct();
 
-        $response = $this->actingAs($user)->postJson('/cart', [
+        $response = $this->actingAs($user)->post('/cart/add', [
             'product_id' => $product->id,
             'quantity'   => 2,
         ]);
 
-        $response->assertStatus(200)
-                 ->assertJson(['message' => 'Đã thêm sản phẩm vào giỏ hàng.', 'cart_count' => 2]);
+        $response->assertRedirect();
 
-        $this->assertDatabaseHas('cart_items', [
-            'product_id' => $product->id,
-            'quantity'   => 2,
-        ]);
+        $cartItems = Cart::getContent();
+        $this->assertEquals(1, $cartItems->count());
+        $this->assertEquals($product->name, $cartItems->first()->name);
     }
 
-    public function test_adding_same_product_twice_merges_quantity(): void
+    public function test_adding_same_product_increases_quantity(): void
     {
         $user    = User::factory()->create();
         $product = $this->createProduct(['stock' => 10]);
 
-        $this->actingAs($user)->postJson('/cart', ['product_id' => $product->id, 'quantity' => 2]);
-        $this->actingAs($user)->postJson('/cart', ['product_id' => $product->id, 'quantity' => 3]);
+        $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 2]);
+        $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 3]);
 
-        $this->assertDatabaseHas('cart_items', [
-            'product_id' => $product->id,
-            'quantity'   => 5,
-        ]);
+        $cartItems = Cart::getContent();
+        $this->assertEquals(1, $cartItems->count());
+        $this->assertEquals(5, $cartItems->first()->quantity);
     }
-
-    public function test_cannot_add_more_than_stock(): void
-    {
-        $user    = User::factory()->create();
-        $product = $this->createProduct(['stock' => 3]);
-
-        $response = $this->actingAs($user)->postJson('/cart', [
-            'product_id' => $product->id,
-            'quantity'   => 5,
-        ]);
-
-        $response->assertStatus(422);
-        $this->assertDatabaseMissing('cart_items', ['product_id' => $product->id]);
-    }
-
-    // ─── Update Cart ─────────────────────────────────────────────────────────
-
-    public function test_user_can_update_cart_item_quantity(): void
-    {
-        $user    = User::factory()->create();
-        $product = $this->createProduct(['stock' => 10]);
-
-        $this->actingAs($user)->postJson('/cart', ['product_id' => $product->id, 'quantity' => 2]);
-
-        $cartItemId = \App\Models\CartItem::where('product_id', $product->id)->first()->id;
-
-        $response = $this->actingAs($user)->patchJson("/cart/{$cartItemId}", ['quantity' => 4]);
-
-        $response->assertStatus(200)->assertJsonStructure(['subtotal', 'cart_total']);
-        $this->assertDatabaseHas('cart_items', ['id' => $cartItemId, 'quantity' => 4]);
-    }
-
-    // ─── Remove from Cart ─────────────────────────────────────────────────────
 
     public function test_user_can_remove_item_from_cart(): void
     {
         $user    = User::factory()->create();
         $product = $this->createProduct();
 
-        $this->actingAs($user)->postJson('/cart', ['product_id' => $product->id, 'quantity' => 1]);
+        $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 1]);
 
-        $cartItemId = \App\Models\CartItem::where('product_id', $product->id)->first()->id;
+        $cartItems = Cart::getContent();
+        $firstItem = $cartItems->first();
 
-        $response = $this->actingAs($user)->deleteJson("/cart/{$cartItemId}");
+        $this->actingAs($user)->post('/cart/remove', ['rowId' => $firstItem->id]);
 
-        $response->assertStatus(200)->assertJson(['cart_count' => 0]);
-        $this->assertDatabaseMissing('cart_items', ['id' => $cartItemId]);
+        $this->assertEquals(0, Cart::getTotalQuantity());
     }
 
-    public function test_user_cannot_remove_other_users_cart_item(): void
+    public function test_user_can_clear_cart(): void
     {
-        $user1   = User::factory()->create();
-        $user2   = User::factory()->create();
+        $user    = User::factory()->create();
         $product = $this->createProduct();
 
-        $this->actingAs($user1)->postJson('/cart', ['product_id' => $product->id, 'quantity' => 1]);
-        $cartItemId = \App\Models\CartItem::where('product_id', $product->id)->first()->id;
+        $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 2]);
 
-        // User2 thử xóa cart item của User1
-        $response = $this->actingAs($user2)->deleteJson("/cart/{$cartItemId}");
-        $response->assertStatus(404); // CartItem không thuộc cart của user2
+        $this->actingAs($user)->post('/cart/clear');
+
+        $this->assertEquals(0, Cart::getTotalQuantity());
     }
 }

@@ -22,8 +22,6 @@ class ProductTest extends TestCase
         ], $attrs));
     }
 
-    // ─── Product List ─────────────────────────────────────────────────────────
-
     public function test_products_index_page_loads(): void
     {
         $this->createProduct();
@@ -51,7 +49,7 @@ class ProductTest extends TestCase
         Product::factory()->create(['category_id' => $cat1->id, 'status' => 'active']);
         Product::factory()->create(['category_id' => $cat2->id, 'status' => 'active']);
 
-        $response = $this->get("/products?category_id={$cat1->id}");
+        $response = $this->get("/products?category={$cat1->id}");
         $this->assertEquals(2, $response->viewData('products')->total());
     }
 
@@ -63,8 +61,6 @@ class ProductTest extends TestCase
         $response = $this->get('/products');
         $this->assertEquals(1, $response->viewData('products')->total());
     }
-
-    // ─── Product Detail ───────────────────────────────────────────────────────
 
     public function test_product_detail_page_loads(): void
     {
@@ -84,6 +80,6 @@ class ProductTest extends TestCase
     public function test_home_page_loads_with_featured_products(): void
     {
         $this->createProduct();
-        $this->get('/')->assertStatus(200)->assertViewIs('home');
+        $this->get('/')->assertStatus(200)->assertViewIs('pages.home');
     }
 }

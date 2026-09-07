@@ -3,23 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WishlistItem extends Model
 {
-    protected $fillable = [
-        'wishlist_id',
-        'product_id',
-    ];
+    protected $fillable = ['wishlist_id', 'product_id'];
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function wishlist(): BelongsTo
+    public function wishlist()
     {
         return $this->belongsTo(Wishlist::class);
     }
 
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
