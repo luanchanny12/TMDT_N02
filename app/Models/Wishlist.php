@@ -2,32 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wishlist extends Model
 {
-    protected $fillable = [
-        'user_id',
-    ];
+    use HasFactory;
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
+    protected $fillable = ['user_id', 'product_id'];
 
-    public function hasProduct(int $productId): bool
-    {
-        return $this->items->contains('product_id', $productId);
-    }
-
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function items(): HasMany
+    public function product()
     {
-        return $this->hasMany(WishlistItem::class);
+        return $this->belongsTo(Product::class);
     }
 }

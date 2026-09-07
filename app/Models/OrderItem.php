@@ -2,19 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderItem extends Model
 {
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'product_name',  // snapshot
-        'price',         // snapshot giá tại thời điểm mua
-        'quantity',
-        'subtotal',      // price * quantity
-    ];
+    use HasFactory;
+
+    protected $fillable = ['order_id', 'product_id', 'product_name', 'price', 'quantity', 'subtotal'];
 
     protected function casts(): array
     {
@@ -25,14 +20,12 @@ class OrderItem extends Model
         ];
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function order(): BelongsTo
+    public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }

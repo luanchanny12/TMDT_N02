@@ -4,91 +4,77 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
-        'name',
-        'slug',
-        'sku',
-        'description',
-        'price',
-        'sale_price',
-        'stock',
-        'brand',
-        'status',
+        'name', 'slug', 'sku', 'description', 'price', 'sale_price',
+        'stock', 'brand', 'status', 'category_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'price'      => 'integer',
-            'sale_price' => 'integer',
-            'stock'      => 'integer',
+            'price'       => 'integer',
+            'sale_price'  => 'integer',
+            'stock'       => 'integer',
         ];
     }
 
-    // ─── Scopes ───────────────────────────────────────────────────────────────
-
-    public function scopeActive($query)
+    public function getRouteKeyName(): string
     {
-        return $query->where('status', 'active');
-    }
-
-    public function scopeInStock($query)
-    {
-        return $query->where('stock', '>', 0);
-    }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    /**
-     * Trả về sale_price nếu có, ngược lại trả price.
-     */
-    public function effectivePrice(): int
-    {
-        return $this->sale_price ?? $this->price;
-    }
-
-    public function isOnSale(): bool
-    {
-        return $this->sale_price !== null && $this->sale_price < $this->price;
+        return 'slug';
     }
 
     // ─── Relationships ────────────────────────────────────────────────────────
 
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function images(): HasMany
+    public function images()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
-    public function cartItems(): HasMany
+    public function primaryImage()
     {
-        return $this->hasMany(CartItem::class);
+        return $this->hasOne(ProductImage::class)->where('is_primary', true)->orWhere(fn($q) => $q->orderBy('sort_order'));
     }
 
-    public function orderItems(): HasMany
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function reviews(): HasMany
+    public function wishlistedBy()
     {
-        return $this->hasMany(Review::class);
+        return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
     }
 
-    public function wishlistItems(): HasMany
+    public function reviews()
     {
-        return $this->hasMany(WishlistItem::class);
+        return $this->hasMany(Review::class)->with('user')->latest();
+    }
+
+    // ─── Accessors ────────────────────────────────────────────────────────────
+
+    public function getImageUrlAttribute(): ?string
+    {
+        $img = $this->images()->where('is_primary', true)->first() ?? $this->images()->first();
+        return $img ? asset($img->image_path) : null;
+    }
+
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->reviews()->avg('rating') ?? 0, 1);
+    }
+
+    public function getReviewsCountAttribute(): int
+    {
+        return $this->reviews()->count();
     }
 }

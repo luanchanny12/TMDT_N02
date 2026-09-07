@@ -2,8 +2,503 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ==================== BASE ==================== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+[x-cloak] { display: none !important; }
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #b8847e, #c9a9a6);
+    border-radius: 999px;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* ==================== KEYFRAMES ==================== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(184, 132, 126, 0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(184, 132, 126, 0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes typing-dot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+}
+
+@keyframes countdown-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ==================== ANIMATION UTILITIES ==================== */
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out both;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s ease-out both;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.3s ease-out both;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+}
+
+/* Staggered animations for children */
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* ==================== HOVER EFFECTS ==================== */
+.hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+.hover-zoom {
+    overflow: hidden;
+}
+.hover-zoom img {
+    transition: transform 0.4s ease;
+}
+.hover-zoom:hover img {
+    transform: scale(1.08);
+}
+
+/* Product card "add to cart" slide-up */
+.card-action {
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+.group:hover .card-action {
+    transform: translateY(0);
+}
+
+/* ==================== GRADIENT TEXT ==================== */
+.gradient-text {
+    background: linear-gradient(135deg, #b8847e, #c9a9a6, #e8c4c4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ==================== GLASS EFFECT ==================== */
+.glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* ==================== LINE CLAMP ==================== */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ==================== SHOPEE-STYLE BADGE ==================== */
+.badge-discount {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1.2;
+}
+
+.badge-flash {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+    font-weight: 700;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==================== STAR RATING ==================== */
+.star-rating {
+    color: #fbbf24;
+    letter-spacing: 1px;
+}
+
+/* ==================== TRUST BADGES ==================== */
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #374151;
+}
+.trust-badge svg {
+    flex-shrink: 0;
+}
+
+/* ==================== QUANTITY BUTTONS ==================== */
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #374151;
+    background: white;
+    transition: all 0.2s;
+    cursor: pointer;
+    user-select: none;
+}
+.qty-btn:hover {
+    border-color: #b8847e;
+    color: #b8847e;
+    background: #faf7f4;
+}
+
+/* ==================== FREE SHIPPING BAR ==================== */
+.shipping-progress {
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+.shipping-progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    transition: width 0.5s ease;
+}
+
+/* Sold progress bar (Tiki/Shopee style) */
+.sold-progress {
+    height: 14px;
+    border-radius: 999px;
+    background: #ffe0e0;
+    overflow: hidden;
+    position: relative;
+}
+.sold-progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+    transition: width 0.6s ease;
+}
+.sold-progress-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ==================== CHATBOT TYPING ==================== */
+.typing-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9ca3af;
+    margin: 0 2px;
+}
+.typing-dot:nth-child(1) { animation: typing-dot 1.2s ease-in-out infinite 0s; }
+.typing-dot:nth-child(2) { animation: typing-dot 1.2s ease-in-out infinite 0.2s; }
+.typing-dot:nth-child(3) { animation: typing-dot 1.2s ease-in-out infinite 0.4s; }
+
+/* ==================== DIVIDER ==================== */
+.divider-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.divider-line::before,
+.divider-line::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+/* ==================== BUTTON SHINE ==================== */
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+.btn-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+.btn-shine:hover::after {
+    left: 100%;
+}
+
+/* ==================== HERO CAROUSEL ==================== */
+.carousel {
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.carousel-dot.active {
+    background: white;
+    width: 24px;
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 10;
+}
+.carousel:hover .carousel-arrow {
+    opacity: 1;
+}
+.carousel-arrow:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+}
+.carousel-arrow.prev { left: 12px; }
+.carousel-arrow.next { right: 12px; }
+
+/* ==================== CATEGORY IMAGE GRID ==================== */
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 12px 8px;
+    border-radius: 12px;
+    transition: all 0.25s;
+}
+.category-item:hover {
+    background: #faf7f4;
+    transform: translateY(-2px);
+}
+.category-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f3f4f6;
+    transition: border-color 0.25s, transform 0.25s;
+}
+.category-item:hover .category-img {
+    border-color: #c9a9a6;
+    transform: scale(1.05);
+}
+
+/* ==================== FLASH SALE SECTION ==================== */
+.flash-sale-section {
+    background: linear-gradient(135deg, #fff5f5, #fff0f6, #fef3f2);
+    border: 1px solid #fee2e2;
+}
+
+.flash-countdown {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.flash-countdown-block {
+    background: #1f2937;
+    color: white;
+    font-weight: 800;
+    font-size: 0.8rem;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+.flash-countdown-sep {
+    font-weight: 700;
+    color: #dc2626;
+    font-size: 0.9rem;
+}
+
+/* ==================== TRUST STRIP ==================== */
+.trust-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.trust-strip-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #374151;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #f3f4f6;
+    transition: all 0.2s;
+}
+.trust-strip-item:hover {
+    border-color: #e8c4c4;
+    background: #faf7f4;
+}
+.trust-strip-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
