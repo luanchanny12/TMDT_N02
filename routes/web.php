@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +15,17 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// ─── Public: Trang chủ (placeholder, sẽ thay ở Day 6) ────────────────────────
+// ─── Public: Trang chủ ───────────────────────────────────────────────────────
 Route::get('/', function () {
-    return view('welcome');
+    /** @var \App\Services\Product\ProductService $productService */
+    $productService = app(\App\Services\Product\ProductService::class);
+    $products = $productService->getFeatured(8);
+    return view('home', compact('products'));
 })->name('home');
+
+// ─── Public: Sản phẩm ────────────────────────────────────────────────────────
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 // ─── Auth: Guest only ─────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -42,6 +51,13 @@ Route::middleware('guest')->group(function () {
 // ─── Auth: Authenticated users ────────────────────────────────────────────────
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+    // ─── Giỏ hàng ─────────────────────────────────────────────────────────────
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    // AJAX endpoints (trả JSON cho Axios)
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
 });
 
 // ─── Admin routes (placeholder, sẽ thêm Day 6+) ─────────────────────────────
