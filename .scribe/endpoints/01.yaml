@@ -36,7 +36,7 @@ endpoints:
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <meta name="csrf-token" content="cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz">
+              <meta name="csrf-token" content="M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03">
               <title>Đăng nhập — DK Social Commerce</title>
 
               
@@ -85,7 +85,7 @@ endpoints:
                   
                   
                   <form method="POST" action="http://127.0.0.1:8000/login">
-                      <input type="hidden" name="_token" value="cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz" autocomplete="off">
+                      <input type="hidden" name="_token" value="M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03" autocomplete="off">
                       <div class="mb-3">
                           <label class="form-label fw-medium">Email</label>
                           <input type="email" name="email" class="form-control "
@@ -133,7 +133,7 @@ endpoints:
         headers:
           content-type: 'text/html; charset=utf-8'
           cache-control: 'no-cache, private'
-          set-cookie: 'XSRF-TOKEN=eyJpdiI6IkVEbmJWMldWdzB5SGNnUEFWb1VDNmc9PSIsInZhbHVlIjoib3lYRVpFYkhYeEJYMjlaaUlXSUwzNVUwMERETmRQOGVlNWRmMEgwVTZVUE5LUkJCaFZsOWkzK0ZheGJ6cFQ5S291WXBpNk1SdWpPMnc0dWxLUzBuT3JYUy9sZnZmV1lzbHRvVE1Zb3g3NTB6V2xhanNLaWtZT0Y4d2RmKzNNQXMiLCJtYWMiOiIzOTJmYWIzYWRiN2IwNzg1OTRiZWUwODU1NmIwYjhkZGM2Zjk2MTNkZTAyMmY3MWNiOTBlNWM4ZDMwNWRmNGE2IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IjJOWlBKVFRoNzQ0OWgwR01POUdZdXc9PSIsInZhbHVlIjoicGtNRCt1cDhSdFc3RUU2WWduZ0xib051c2hnR2xsRmJOaG81RUhIbGlFa3ViNUZRdk0zb0NvYUt5bXltV0JlM2FoNkxTd3cxbUlycWl1QlIzQm56ZEV5OHd2NlRrM3ZRU3E1Z3JxOVNSVDVDTUhSYmJCMStmRTNMcXpIZ25LeEsiLCJtYWMiOiIwMzUzMTVlZjk2OGVjMmMyYjcwNmE1OTNjM2UwNTI3MzE4ZmY4YzViYWEyZDA4YjExOTI0MTVhZjEwZGY2ZTU4IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax'
+          set-cookie: 'XSRF-TOKEN=eyJpdiI6Im5tUXFFREZ2TlNNajdIZnRLOXFYOUE9PSIsInZhbHVlIjoidDNBZ3VvczFHcGUxNDYxQlA4NFliYWNJcVhIRFh0ejNXcUczc3RUaFZTM00rdnliWHM2KzZtUmFBUEdvekpTbkFHbEx2dHZ5TWEyYUlJRlV6K3RMMUcrVzR0TndQckRPbjJDWEVqeXl4SHNrWkxVTnhLSmFQSFE0OFFpQmVWekEiLCJtYWMiOiJlODg1NzVkNWZjMjZmYjRiYzNiZTkzNzdlNjEwYWJlMjc0MGNkNzlkOWM1NWVhMmU1NmI2NDg1YTk2ZGU1YzAyIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkZuZExzZWJCb3JTWVArSXBOSDdYUlE9PSIsInZhbHVlIjoiWThqbTVvZVh2Yy9RR3BLQXVOK0w0R29FSTAxWVhXOWtCS1lXSFhOd3o3cEV2M3VHN3ZVdzZMdDRmMi9PNThXSDNCNGgyU3lheVhILzZqUEtMRVpzTWpXTjBUTFg0WjVYSmtBZ1VpcjV2bElydlk1cHlLb3pFMXphem0xd0hQYVAiLCJtYWMiOiJiNTBjOWQyMDBlZmUzZjYyMWI5MmE1MTNiZTk2MGM3YWM1YzRmODg3ZDI1ZGZlZTE5ZDk0MjcwN2E2MmMwMTJkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax'
         description: null
     responseFields: []
     auth: []
@@ -254,7 +254,7 @@ endpoints:
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <meta name="csrf-token" content="cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz">
+              <meta name="csrf-token" content="M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03">
               <title>Đăng ký — DK Social Commerce</title>
 
               
@@ -298,7 +298,7 @@ endpoints:
 
                   
                   <form method="POST" action="http://127.0.0.1:8000/register">
-                      <input type="hidden" name="_token" value="cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz" autocomplete="off">
+                      <input type="hidden" name="_token" value="M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03" autocomplete="off">
                       
                       
                       <div class="mb-3">
@@ -351,7 +351,7 @@ endpoints:
         headers:
           content-type: 'text/html; charset=utf-8'
           cache-control: 'no-cache, private'
-          set-cookie: 'XSRF-TOKEN=eyJpdiI6Ii91SzU3SzliYTJiMkxmc0IxazlQc1E9PSIsInZhbHVlIjoidHUrbG5GbWVnaXY2Rzk0cFpTTk5XMEI1SnNFeWlGRXJzTDl4VUNDUTZoZkdlS1BtQmlXa3JxSitYcTJ0NDZIcUVmaTl3bDY3V0xRbTJ2TGJpc0UrcnhMeG5FcDZSdFI1anIwSjdRRGxVOS9sVE1FdlpydkdkNXZONHdZSzdsVU8iLCJtYWMiOiI0Y2ZiY2U3Y2Q5OWZkNWU4NWU4YjYzZGUzOTVmMThiMGFiNDY3Mjk4OWNmMDljZjU4N2RjZjEyYmYwYzVmZmFlIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkF2RkNyalA3RkNEajM5VmdqZ0U4NVE9PSIsInZhbHVlIjoidmVoUW5WakZucG9jcjZVejA3c2ZxN0tBYkFCdm9kNjZObmhPTHA5c3A4d2VXM01xbTNtNkV5OTRNaXhndnp6cU9wTDNmYWZoRDZpMmtqbkUwTXFmdFJvQ3prSmp1RjZPT2drS1p0Y1I5OVFXOG1RSnhoR05UWEUzdTF4bE9uMFMiLCJtYWMiOiI3YmJmYTg2ZDUzMGU4YWJjMzBmNjhlMDQ1MzI1OGM0NDdmZTUwMWRlZDk3NTc0M2Y1OGQ2MzAyM2YxNjQwNGVmIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax'
+          set-cookie: 'XSRF-TOKEN=eyJpdiI6Ikc0SFczWGJEbklTL2FhRDZ0YS9raXc9PSIsInZhbHVlIjoiM00rZVVkVVlOSlRCeksyT1NZaXhUVUpwbVhZN3RKU2UzaVZrRENWMlFoZ1JXd1B3V2NaS3ExeGRjSGxxVythWlZrV01RRVFGdnNhVmNkT1pLVTJydkpzbkdaeHpqNmNBZjlEeWFHQ2pFdnBUQWFlNXJwTEVoUXd6MVVPV2dtU1kiLCJtYWMiOiJiNDZiNjFhOGRlNjZhZWQ5ZTNiYzg2NjM1YjVjNGQ5OTEwNDJjNDVhMDdmM2NjM2VhM2IwOGZjNjg2OTA5NzExIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6Iis2cTJkbGo1TVcyUVJDVmFjM3hQMFE9PSIsInZhbHVlIjoieDI4U2N2U3p3SGxLZVM4OVJYTlNjS2dRT1JHUk5sdFNMQXo1N0VrbGliVmxDR0NnSHp4WCtBM0p0TUEvRXV3ZVM4WDNhNGhmdExwTEtOYkNjSDZVS210bW9YYjZQT3FtSU80Ly9Zb2MydmtuOXU5VVNhUnJrU1JpcXdib1lRdUUiLCJtYWMiOiJjMGY3YzJlNjY3ZjU3MGZiNjAzYTg4YjI3ZjUyZTk2MmMxZmE2YTAxZmUzMGJmZTVhOGUwNjg2ZWQyY2IyN2JkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax'
         description: null
     responseFields: []
     auth: []

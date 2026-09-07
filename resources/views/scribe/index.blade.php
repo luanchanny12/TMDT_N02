@@ -224,7 +224,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">content-type: text/html; charset=utf-8
 cache-control: no-cache, private
-set-cookie: XSRF-TOKEN=eyJpdiI6IkVEbmJWMldWdzB5SGNnUEFWb1VDNmc9PSIsInZhbHVlIjoib3lYRVpFYkhYeEJYMjlaaUlXSUwzNVUwMERETmRQOGVlNWRmMEgwVTZVUE5LUkJCaFZsOWkzK0ZheGJ6cFQ5S291WXBpNk1SdWpPMnc0dWxLUzBuT3JYUy9sZnZmV1lzbHRvVE1Zb3g3NTB6V2xhanNLaWtZT0Y4d2RmKzNNQXMiLCJtYWMiOiIzOTJmYWIzYWRiN2IwNzg1OTRiZWUwODU1NmIwYjhkZGM2Zjk2MTNkZTAyMmY3MWNiOTBlNWM4ZDMwNWRmNGE2IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IjJOWlBKVFRoNzQ0OWgwR01POUdZdXc9PSIsInZhbHVlIjoicGtNRCt1cDhSdFc3RUU2WWduZ0xib051c2hnR2xsRmJOaG81RUhIbGlFa3ViNUZRdk0zb0NvYUt5bXltV0JlM2FoNkxTd3cxbUlycWl1QlIzQm56ZEV5OHd2NlRrM3ZRU3E1Z3JxOVNSVDVDTUhSYmJCMStmRTNMcXpIZ25LeEsiLCJtYWMiOiIwMzUzMTVlZjk2OGVjMmMyYjcwNmE1OTNjM2UwNTI3MzE4ZmY4YzViYWEyZDA4YjExOTI0MTVhZjEwZGY2ZTU4IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6Im5tUXFFREZ2TlNNajdIZnRLOXFYOUE9PSIsInZhbHVlIjoidDNBZ3VvczFHcGUxNDYxQlA4NFliYWNJcVhIRFh0ejNXcUczc3RUaFZTM00rdnliWHM2KzZtUmFBUEdvekpTbkFHbEx2dHZ5TWEyYUlJRlV6K3RMMUcrVzR0TndQckRPbjJDWEVqeXl4SHNrWkxVTnhLSmFQSFE0OFFpQmVWekEiLCJtYWMiOiJlODg1NzVkNWZjMjZmYjRiYzNiZTkzNzdlNjEwYWJlMjc0MGNkNzlkOWM1NWVhMmU1NmI2NDg1YTk2ZGU1YzAyIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkZuZExzZWJCb3JTWVArSXBOSDdYUlE9PSIsInZhbHVlIjoiWThqbTVvZVh2Yy9RR3BLQXVOK0w0R29FSTAxWVhXOWtCS1lXSFhOd3o3cEV2M3VHN3ZVdzZMdDRmMi9PNThXSDNCNGgyU3lheVhILzZqUEtMRVpzTWpXTjBUTFg0WjVYSmtBZ1VpcjV2bElydlk1cHlLb3pFMXphem0xd0hQYVAiLCJtYWMiOiJiNTBjOWQyMDBlZmUzZjYyMWI5MmE1MTNiZTk2MGM3YWM1YzRmODg3ZDI1ZGZlZTE5ZDk0MjcwN2E2MmMwMTJkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -232,7 +232,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IkVEbmJWMldWdzB5SGNnUEFWb1VDNmc9PSIsInZhbHVlIjoib
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;meta name=&quot;csrf-token&quot; content=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot;&gt;
+    &lt;meta name=&quot;csrf-token&quot; content=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot;&gt;
     &lt;title&gt;Đăng nhập &mdash; DK Social Commerce&lt;/title&gt;
 
     
@@ -281,7 +281,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IkVEbmJWMldWdzB5SGNnUEFWb1VDNmc9PSIsInZhbHVlIjoib
         
         
         &lt;form method=&quot;POST&quot; action=&quot;http://127.0.0.1:8000/login&quot;&gt;
-            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot; autocomplete=&quot;off&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot; autocomplete=&quot;off&quot;&gt;
             &lt;div class=&quot;mb-3&quot;&gt;
                 &lt;label class=&quot;form-label fw-medium&quot;&gt;Email&lt;/label&gt;
                 &lt;input type=&quot;email&quot; name=&quot;email&quot; class=&quot;form-control &quot;
@@ -675,7 +675,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">content-type: text/html; charset=utf-8
 cache-control: no-cache, private
-set-cookie: XSRF-TOKEN=eyJpdiI6Ii91SzU3SzliYTJiMkxmc0IxazlQc1E9PSIsInZhbHVlIjoidHUrbG5GbWVnaXY2Rzk0cFpTTk5XMEI1SnNFeWlGRXJzTDl4VUNDUTZoZkdlS1BtQmlXa3JxSitYcTJ0NDZIcUVmaTl3bDY3V0xRbTJ2TGJpc0UrcnhMeG5FcDZSdFI1anIwSjdRRGxVOS9sVE1FdlpydkdkNXZONHdZSzdsVU8iLCJtYWMiOiI0Y2ZiY2U3Y2Q5OWZkNWU4NWU4YjYzZGUzOTVmMThiMGFiNDY3Mjk4OWNmMDljZjU4N2RjZjEyYmYwYzVmZmFlIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkF2RkNyalA3RkNEajM5VmdqZ0U4NVE9PSIsInZhbHVlIjoidmVoUW5WakZucG9jcjZVejA3c2ZxN0tBYkFCdm9kNjZObmhPTHA5c3A4d2VXM01xbTNtNkV5OTRNaXhndnp6cU9wTDNmYWZoRDZpMmtqbkUwTXFmdFJvQ3prSmp1RjZPT2drS1p0Y1I5OVFXOG1RSnhoR05UWEUzdTF4bE9uMFMiLCJtYWMiOiI3YmJmYTg2ZDUzMGU4YWJjMzBmNjhlMDQ1MzI1OGM0NDdmZTUwMWRlZDk3NTc0M2Y1OGQ2MzAyM2YxNjQwNGVmIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6Ikc0SFczWGJEbklTL2FhRDZ0YS9raXc9PSIsInZhbHVlIjoiM00rZVVkVVlOSlRCeksyT1NZaXhUVUpwbVhZN3RKU2UzaVZrRENWMlFoZ1JXd1B3V2NaS3ExeGRjSGxxVythWlZrV01RRVFGdnNhVmNkT1pLVTJydkpzbkdaeHpqNmNBZjlEeWFHQ2pFdnBUQWFlNXJwTEVoUXd6MVVPV2dtU1kiLCJtYWMiOiJiNDZiNjFhOGRlNjZhZWQ5ZTNiYzg2NjM1YjVjNGQ5OTEwNDJjNDVhMDdmM2NjM2VhM2IwOGZjNjg2OTA5NzExIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6Iis2cTJkbGo1TVcyUVJDVmFjM3hQMFE9PSIsInZhbHVlIjoieDI4U2N2U3p3SGxLZVM4OVJYTlNjS2dRT1JHUk5sdFNMQXo1N0VrbGliVmxDR0NnSHp4WCtBM0p0TUEvRXV3ZVM4WDNhNGhmdExwTEtOYkNjSDZVS210bW9YYjZQT3FtSU80Ly9Zb2MydmtuOXU5VVNhUnJrU1JpcXdib1lRdUUiLCJtYWMiOiJjMGY3YzJlNjY3ZjU3MGZiNjAzYTg4YjI3ZjUyZTk2MmMxZmE2YTAxZmUzMGJmZTVhOGUwNjg2ZWQyY2IyN2JkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -683,7 +683,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6Ii91SzU3SzliYTJiMkxmc0IxazlQc1E9PSIsInZhbHVlIjoid
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;meta name=&quot;csrf-token&quot; content=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot;&gt;
+    &lt;meta name=&quot;csrf-token&quot; content=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot;&gt;
     &lt;title&gt;Đăng k&yacute; &mdash; DK Social Commerce&lt;/title&gt;
 
     
@@ -727,7 +727,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6Ii91SzU3SzliYTJiMkxmc0IxazlQc1E9PSIsInZhbHVlIjoid
 
         
         &lt;form method=&quot;POST&quot; action=&quot;http://127.0.0.1:8000/register&quot;&gt;
-            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot; autocomplete=&quot;off&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot; autocomplete=&quot;off&quot;&gt;
             
             
             &lt;div class=&quot;mb-3&quot;&gt;
@@ -1285,7 +1285,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">content-type: text/html; charset=utf-8
 cache-control: no-cache, private
-set-cookie: XSRF-TOKEN=eyJpdiI6Ikh2MEJLWnptMkdTbFd4UmdBcDgwRWc9PSIsInZhbHVlIjoiMFpxRU9TbVJCOGRlZkRwc3lDME0wbmx0NTVRL1RDU3BhdDkyVUUzWWVSZ3lYeWpEUWQvdWFXcU93NUhIZlRYbDRYQVM3aE5jYmlxUE5FSUlhdVpsbXN1VE8wRU1VZndRWDNMVTlzSjBuQkZmTk0rdWtGeGk0Sjk1UVpoN2JRTjgiLCJtYWMiOiJlYzgwMzU5YjZmY2E4NjMzODYwNjQ4YjU2MzNhYTFjNDViY2MyYTc3MzU2NzliZjRhYTUwM2RlNzgyNjE0OGNlIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6InoyQ0dWeVRjYWd0Q2o0cGdzbXAwL0E9PSIsInZhbHVlIjoia1NyekgwQTRtekZaSFgybktDUTVGNW9uUXdodnE4TC9nTTVkM1hvOEVOdFczdjU2K2duLzVuUWVSMHRybE5yUG1KYlArUzFvZ0ZVWHZRaVFLUEMyL1lrcDhVUklWWU41QkMwa3FtUy8zZ2N3TDAvNXBIU3UzdTRHSzZtUUdpekEiLCJtYWMiOiJhMmFkODVhOWI4NTRiM2E3ZTg0ODliZTViMzgxMjg1MzQ0OTBmZThlZThiMzBkOTBmNWRkMzE4MzFmZjMxODYwIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6InNHUXNmR1NydVR3L0JqZllBVlFnUmc9PSIsInZhbHVlIjoiQnFnbFRqNHFhaW1ZOTlkOFFDZUd4T1BZZEZmL1dZTXdMVVNDMkVVM0lGbjg5WGJ4Z1l5Z1VGVHI5bVFMMGxwYlBNM2lZVUtyeFQ2OW9IQlpCQWhCbXpSZmVUQlJmWnYvL1ZHaEI1bTIyQ0pnQlVMMXZ4MHNwN3NMMUpDdzFLalciLCJtYWMiOiJhZjYzNzJiNGZkOTUyNzMzNGFlZjVlMmRlZmRhYjg5MjYxZTY1NDZkNTI0ZjE1ZjAzODg2MDc5MTNjNjdmODYxIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkJ4ZlYzRGd6ZzBhL3N0cWs2OTZiVkE9PSIsInZhbHVlIjoiUS9JNDY2YksrUHg5UXhKR3JQTlVtU1lhcUxzLzBJUmVwNEhPUmdzak1aSjRyQzBLdFdQRU42MHhUY3BUamFZYmF5MW02S1p3TVNEbnlRaTV5Q2thVXhnZGU5VE5CMGlSZ2RTRFB1eWpjRjdYN3dSMlQyUFlNUjVpbGUwT01hRkYiLCJtYWMiOiJjN2QzZmM0ODY5YjI4MzdkY2Y1NzI4YmQ3ZmIzOThiYTljM2FiYzA3YTQ1OTg3OTgyYzIwOWYyNTFkMmY4OGEwIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -1629,7 +1629,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">content-type: text/html; charset=utf-8
 cache-control: no-cache, private
-set-cookie: XSRF-TOKEN=eyJpdiI6IjB3VEozREtSOUlKRUlyTGhMZGFxR0E9PSIsInZhbHVlIjoiRlF2V3owRzltM1JVUnB4cVlWcGl3TjNOaC9oUVJtUXpWUEdUWmpmeEg1OVNMYUtPamJKczBLWEpyM0Q4NER6cHZ4aHY0MGJOVjlESy9mbmJESVJvUkJZMnNtN0VUejU1YTE0OSs3OWtUWUVUYzRkZm52SExuV1d2QktDb0NKSGwiLCJtYWMiOiI3MGE2Y2E2ZmQ0NjRhNzMyYTc4ZWY5ZGJmYWM5YWFjZGE5MThlN2M2MDQwYThjYjdmMWUwMTZjYTdhNjFhYWRjIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6IkhVdFU4Wk55KzFhN2RTZUFjWmdtRmc9PSIsInZhbHVlIjoiVUloU1ZHTXp0Sk5iT0JBNDNpUWNNOEI1Z3liRExZZ2tOeUJZL0RjS2VjSTFGZXVTbE9tZStQMkdpQWhqYWEzZWRFQ1Y5MGxYSG9MS3h5SWNvajRjM25FSGdPeWdDc3FzMWRsWmJDRVptbDNhOW03bVhZcFRzWEhIWUhzenoyRHQiLCJtYWMiOiI0ZDhkYmI4ZDY1Y2Y0OTdiNzAwNTk2ZjQ1MDRiNzAxNzZmMGYwYzU5MDJiODc2MjcwMjgxODg4NDliOTIwYWIyIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6InVjKytSaEo5bXJsa1lZMDMwN3VWV0E9PSIsInZhbHVlIjoiazF6bFMra0ZGVmxoM05jUWF1cFExY3VWdXVONXRwa1ZSMWJvR3VZWG5hZ2RtTXdPa255L3Y1N1lxMnJXeForbm1zZnhoWXlXWFM0UDBGdytTaWNoUUtlR3c1UzhmOFdqNnBKSWNDbHlXTldIdEVSZGp3ZGdLeENQaW5CcTV4cmMiLCJtYWMiOiJmYzBhMWY2OWE5NWUxZDg2ODE4ODlkMTgyMGVlYzQ1ODY0Njk1Y2ZlMzg0MDVmNjBlZWRkMDY4MWJhNmYzNjEzIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6Im1HVkxxVFUvYnFSR1pDenk0d1doQlE9PSIsInZhbHVlIjoia05qZC9BWEtGc0NibTlJUDRZTHFBV0RPOFQyeUlISzd1eU05YzErRjJyNnZXdEdLMjZTeGpFb2xWTGFWUEQyYWNQbDlaSTN6Q2JadTVjOWN1REdTMjhZZ08vNTFFUWNLZU9zc3BtUlZKeWErTlJ3QTc0bE1kaGtwRGVKS0dmSXciLCJtYWMiOiIyNjFlN2RmN2M5NmViMjBiYjIwZmZiYmNhMDRmZTNhMmIzZjQxNjMzODE2Y2VjODViNThjZDUxNjc5ZTJlYWQ5IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -1637,7 +1637,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IjB3VEozREtSOUlKRUlyTGhMZGFxR0E9PSIsInZhbHVlIjoiR
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;meta name=&quot;csrf-token&quot; content=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot;&gt;
+    &lt;meta name=&quot;csrf-token&quot; content=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot;&gt;
     &lt;title&gt;Qu&ecirc;n mật khẩu &mdash; DK Social Commerce&lt;/title&gt;
 
     
@@ -1686,7 +1686,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IjB3VEozREtSOUlKRUlyTGhMZGFxR0E9PSIsInZhbHVlIjoiR
         &lt;/p&gt;
 
         &lt;form method=&quot;POST&quot; action=&quot;http://127.0.0.1:8000/forgot-password&quot;&gt;
-            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot; autocomplete=&quot;off&quot;&gt;            &lt;div class=&quot;mb-3&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot; autocomplete=&quot;off&quot;&gt;            &lt;div class=&quot;mb-3&quot;&gt;
                 &lt;label class=&quot;form-label fw-medium&quot;&gt;Email&lt;/label&gt;
                 &lt;input type=&quot;email&quot; name=&quot;email&quot; class=&quot;form-control &quot;
                     value=&quot;&quot; placeholder=&quot;ban@example.com&quot; autofocus required&gt;
@@ -1994,7 +1994,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">content-type: text/html; charset=utf-8
 cache-control: no-cache, private
-set-cookie: XSRF-TOKEN=eyJpdiI6IkxycmtTL3Fqa0JySnF5dWNOS2FYM1E9PSIsInZhbHVlIjoiMU5ic0MrQ2QwZG53Z3pPRkd4QVVod2kwdFFQMFNrTGZzd2J2dllnZ01ma0d6c2Q5ZGw0ZURMT1ZCcHdxejJCRVRwRWJkbmxZRXhKc3F6VnBmSzZVT2FPZHh2bGtneVZtK2t4WGNqRzkzeUNLdXhYVy9qTENkRlpUemd2S3hCUU8iLCJtYWMiOiI1MGRjYjJlZjg1NGQ1ZDJiNmExNTU3ODBlMGU0NTdlYmQzZGI5ODNjMTk2M2IxNDFhMGY3ZTkxNDliNWI3MjZlIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6InJuUkFmM1NGOWhpL3B5TXBlbGp0N0E9PSIsInZhbHVlIjoiR1pSVG5tMTFTVExvU2ROK01jM2lIWmp4YkxVUmRkV3BmTkhneDJsVDkwek05ZDVzOVFXRkg1OE9yRHdnSG9rdDFXR0pKSTNkWFBxRzRSU3Mxb0p5ajJ4R3d6amNnSDd4dFROS2ZuT1pnK3hFVlBOdzd0cmtvUGNaMXdJeFV0RUUiLCJtYWMiOiI3MjI1Yzc5NTkxYWY4NmYxMjliZGJiNGM2Y2RjYjQ2MzdiYmZhNzUzZWU0MmY3NTAyNzVjZTA0M2NjNGNkNGNmIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6IkZaaVVDS0llTHV4Nmx6TEVEOXIyU3c9PSIsInZhbHVlIjoidHl6QzRGQzhzV2pqZUJMUGJNak5pdFUvUnBEUzdmck9GaUJ2d1psR0ViWmVpem90d2wvS0VxQnJ1UkI4Ylc1cit6WmdOcnRnU3AxeEZNSEJBTEVIS3RGWnpYMVJzRWZpTmxpUW9rRzNtSXVWRUMzOXJpb2M1NWkybGF1aFFVR0giLCJtYWMiOiJiNTZiYzAwOTM2YzA2Y2JiNGI5Zjc1MWYxZGJjYmMzYjdjYzE0YjE0ZTIwZDg5NTlkNmZmZmE3MmY1ZDRhNDE3IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6ImdMb3JsTUs1Tk5yQnVPVG9pdTNFanc9PSIsInZhbHVlIjoiTll3MDBmYWdxdVpSWVJ4TEl2d2QvRlRseGN6T2tEWkduRXBrbHh0SmhqT2xNQU0vOHQzdmEzUmFEbTlYOUZ0SjBDc1p4YlpFQUxPNzFaVVROTmZZd2ZMMWczR3A5bDJMT1BUYkIzU0JjZjVFQngrZFlZS24yZ1lmMENzTkNzRGsiLCJtYWMiOiI2ZTczZmU2MjA2ZDk1NTYyM2JhNTcwOTY5Y2UzMjViMDZmNjE5OGM0YmZjZGEyNmM0MzY5ZTdkNDY0YTc1ZTNjIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -2002,7 +2002,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IkxycmtTL3Fqa0JySnF5dWNOS2FYM1E9PSIsInZhbHVlIjoiM
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;meta name=&quot;csrf-token&quot; content=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot;&gt;
+    &lt;meta name=&quot;csrf-token&quot; content=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot;&gt;
     &lt;title&gt;Đặt lại mật khẩu &mdash; DK Social Commerce&lt;/title&gt;
 
     
@@ -2046,7 +2046,7 @@ set-cookie: XSRF-TOKEN=eyJpdiI6IkxycmtTL3Fqa0JySnF5dWNOS2FYM1E9PSIsInZhbHVlIjoiM
 
         
         &lt;form method=&quot;POST&quot; action=&quot;http://127.0.0.1:8000/reset-password&quot;&gt;
-            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;cuxz2d5awAKhVYAInQIHXHQH1rK58VQXFnxPypXz&quot; autocomplete=&quot;off&quot;&gt;            &lt;input type=&quot;hidden&quot; name=&quot;token&quot; value=&quot;architecto&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;_token&quot; value=&quot;M69m96wbJQ6iibnsc8HDUSVzvRRXLUhvNsvInA03&quot; autocomplete=&quot;off&quot;&gt;            &lt;input type=&quot;hidden&quot; name=&quot;token&quot; value=&quot;architecto&quot;&gt;
 
             &lt;div class=&quot;mb-3&quot;&gt;
                 &lt;label class=&quot;form-label fw-medium&quot;&gt;Email&lt;/label&gt;
@@ -2406,21 +2406,21 @@ print_r(json_decode((string) $body));</code></pre></div>
                 <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
-location: https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;scope=openid+profile+email&amp;response_type=code&amp;state=gstFpJXdzTLHd28Zj6sSvBcKRMTdp6bib2KASjT3
+location: https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;scope=openid+profile+email&amp;response_type=code&amp;state=Fz5FxtWptVEXF9RhfLaxiwHlgqbRjhD3vRKWWWXZ
 content-type: text/html; charset=utf-8
-set-cookie: XSRF-TOKEN=eyJpdiI6InBFMlZtQ2ZTRlNjakNNNDRYM0dhemc9PSIsInZhbHVlIjoiTEhLSW1VenNYeStSbjFJVFE4dTNMZWU0SThNeENkV2g3Zng2WXVMTG9oTFJidFh6SmxMWXMvSVV0aDBnVUNSdFNVMERNekNvSGRYd0JrbW9YZmUrbGp2Qy9HaE9jNld4RHNsRm9ya2pwbWxYSEJMWW1ZL1lRZzVZVGJ4Z0JIN0ciLCJtYWMiOiJmZDMyZTdkYmZkZjVhZjMxODk0NDcwZmE4ZDVjMThhYzMwMDU5MTFiMmZiMjFhNDQ5ODIzNmM3ZTAwNTkzMjQwIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6InplUFB0VlpTY3NFWGh5VEU2WERQTFE9PSIsInZhbHVlIjoicjc4Nks1YjMvNHZ3YzVHTGdXSGlYMXJVZTJoa0NsUURzcm5SVFhtL2NQQ0NxL00xTnduRnk4MGl1SDdKQkduYjFkQ1YvMzV0N2dCOW5RZ3ZLelZlOXRqV2dkUTdTcjZ4SU9Eci84V2JtNVo3U1J2WTZYVlJqa1JhR1NWQWhOTGwiLCJtYWMiOiJmODI2YjU0NmI5MTNiMTAwMDM4ODEwODE0NDA2N2JjNTNlNTE2OGFlYjVjZjY3NDkyZGFkM2NiZmQwN2E4M2JiIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6IlFFTDUvT294QVU5OU9KQlY0eUhzN0E9PSIsInZhbHVlIjoiY2t5YmQ5TktoTnNlZjc5bkNXbS9admFhcmJUV1hVNURBd1BMSlpxUkNDOFBXUUt5N1QrNkwzR0NubUxVaDMwakdtNUtPY2R3L1VVSmprQjJ0cVdmWmhoT3plT1VnZks2QmkxUFo0K2N5bS94VGlLWGFQTVVQS1FQMzZIdFZKaUsiLCJtYWMiOiJhZDgwNTkyYWNjOWJlZDY5NzU0YjczNGZiOGRmYzk4YWM1ZWFlMzVkMjJhNmI2ZDI2NGU2MmQwMWRkNDcyYWFmIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6Inh5YWJGWGZiNG9sYjJzNUg1QU90ZUE9PSIsInZhbHVlIjoiaTNhS0wxWHBRT3BmbU5KdkRrMmNnMExPWDVLbHhOMXZDY3N0UVZrMVpKY1pEMVpNV0RqTjczZC94Q1hxVkRJTEl1alpqVTJvNUVtUVVEU3ZGQzlMSzFaOHdrdS84RC9PN3oxaG5LSDZkSmk3OWxMQ1craGsydjhoNWJyczlxVi8iLCJtYWMiOiI4OGNmY2FmNjExZjYxN2U3OTI1NzJkYWQ4MTE3MzkxZGFiM2RlYWQ0YTEzNmUzMTMxZGI4ZjFkZjY3NWJiN2RhIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
     &lt;head&gt;
         &lt;meta charset=&quot;UTF-8&quot; /&gt;
-        &lt;meta http-equiv=&quot;refresh&quot; content=&quot;0;url=&#039;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=gstFpJXdzTLHd28Zj6sSvBcKRMTdp6bib2KASjT3&#039;&quot; /&gt;
+        &lt;meta http-equiv=&quot;refresh&quot; content=&quot;0;url=&#039;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=Fz5FxtWptVEXF9RhfLaxiwHlgqbRjhD3vRKWWWXZ&#039;&quot; /&gt;
 
-        &lt;title&gt;Redirecting to https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=gstFpJXdzTLHd28Zj6sSvBcKRMTdp6bib2KASjT3&lt;/title&gt;
+        &lt;title&gt;Redirecting to https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=Fz5FxtWptVEXF9RhfLaxiwHlgqbRjhD3vRKWWWXZ&lt;/title&gt;
     &lt;/head&gt;
     &lt;body&gt;
-        Redirecting to &lt;a href=&quot;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=gstFpJXdzTLHd28Zj6sSvBcKRMTdp6bib2KASjT3&quot;&gt;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=gstFpJXdzTLHd28Zj6sSvBcKRMTdp6bib2KASjT3&lt;/a&gt;.
+        Redirecting to &lt;a href=&quot;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=Fz5FxtWptVEXF9RhfLaxiwHlgqbRjhD3vRKWWWXZ&quot;&gt;https://accounts.google.com/o/oauth2/auth?client_id=119151935539-si5vb2ov5lb67ochephos5vt1chisqe7.apps.googleusercontent.com&amp;amp;redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fauth%2Fgoogle%2Fcallback&amp;amp;scope=openid+profile+email&amp;amp;response_type=code&amp;amp;state=Fz5FxtWptVEXF9RhfLaxiwHlgqbRjhD3vRKWWWXZ&lt;/a&gt;.
     &lt;/body&gt;
 &lt;/html&gt;</code>
  </pre>
@@ -2561,7 +2561,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             <pre><code class="language-http">cache-control: no-cache, private
 location: http://127.0.0.1:8000/login
 content-type: text/html; charset=utf-8
-set-cookie: XSRF-TOKEN=eyJpdiI6IkdhSUNNblFWVCtUMTdwaHIxYlp1T2c9PSIsInZhbHVlIjoieXVPVHBBRnZFOXpiNXlLUWtLWDRsQU1aSjgvaWtUVEdrQ21XTHE0ejdsdGJCaFhSQWdQT0RsU2QrbFI5U2JpUENuMGpZMm10THNDUXg3UnVpZ2MxMHZCU2FMdTBEWlY5dFNNUUZsSTNlaEFRMmlJUEJFalRUSFRJck9JUVh2UE4iLCJtYWMiOiIxYjJiYzkxYzM1NzQ2MzJmZjdlZTZjODAyNDhlZmQzZjIzZjRhZmY1N2E1ZDU4ZDgxOGYwOTRmNzFkZjRiMzlkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6InN2VVdpM0o3WkdKaHkxeEdKMWNmV3c9PSIsInZhbHVlIjoiVkcwNzlPNElaSFltSTVySDYxS1VBZHkvdTNjVnFob01JSDFtcStaT0lyZUN2S0E2NHJBYlArL1VYcXM1MlJURnI1NlRvQnpaVnpadDhZc0ZyUzV5Q1JaQzhGZkphNW1Mdk1EMkN4RzZoRWpHSldsUXk0cGRKYk5UZy9VOGpqZDgiLCJtYWMiOiIzYWVkMGFiOTEyN2QyNjIxMzlhZDZhZTdjZGQ4NGUwZTU5MzI0ZDdjODlmZjVhOWM0ZjBlZWU3MmRmODg3MThiIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6Ik8vRjFCZ1lITnRRMG9SSkZoT3NWaVE9PSIsInZhbHVlIjoidFVpbFZJSlF6S2ppaitDcEJza2dMNUprb080Vkkva0ZzVzI0VGlEdTQvdjA2UEFpSUlHMlhJNVAzNlRLVDNUTE9Ca3lySlkxMnNVQ24xd2w3dGlETmdUN2NZRjE5UFY1NEhuOUNSSGt3NitPSFk5N05RTjI3OEcyc0FZU3pMZEMiLCJtYWMiOiI3ZTMxOGRkMmEyMTA3MGU0MTc5Mzc2NTQzYjc4MGQxNmVhYTRkZDViODgxMzAxNTk1MWUwNmVkNzJjYTFiNmMzIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6ImdxL0RGZnRHOU5rK1VkZE9KNHdheHc9PSIsInZhbHVlIjoiUGFmaHNaZndrN3lxL0RPRDJhcEhWcC9aRTJmd3NidlprQVpoR0lTUkxDTEE2YUVSRmJ3bEpJSjkrTVRaaGNVR1B1eXlubXVLQVZyOEp0dURFV05NVEFYUFJPdGJlN1hvZllKTmNiMEIxSXNVYVNRM3dRZ0lHNENLNVREanh0N1giLCJtYWMiOiIwOGYyM2YwYWI2YzcxNzI0MzI0ZTcwMWNmNzRhZmFiYTczNmU3ODdhYmMwMGI2Y2Y3Y2RkYTRmYTVjYjY5ZDJkIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">&lt;!DOCTYPE html&gt;
@@ -2713,7 +2713,7 @@ print_r(json_decode((string) $body));</code></pre></div>
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-set-cookie: XSRF-TOKEN=eyJpdiI6IjFlZXp3T1lnYUZNZHZrNWFCc2U1aFE9PSIsInZhbHVlIjoibUpWN1J2eTQ3Q282OWtPeXNVQ012YVpMdGFXUjdqcFpJWkZVVUZrR2s5U0h4bWEwZmdSOG9XSHlRSjVVd0oyYXRYclRjdkFYTk94Y2VMdWR5eUJ3Y1Q1ZmZpTFFwd2R1d2RZb3dDZERocnduRDk1QUs0ZmhYR1hPWG9jaG9yTkkiLCJtYWMiOiJhNWZmZDc3YmQzMGY3ODA4NjljMzVjZmJiZTYyYTI4OWNhOWNjMTBlNWVhMGJjY2ViYzQ5ZjQ4NGNiMTc5Mzk1IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6Ijg3S1R1Y3hqYmRySjJNZDI4akpYSGc9PSIsInZhbHVlIjoiM0hzR3EwUFltL1AxYjJBVDAvTkp0cWY4N3hFcEEySHpDTWtucmFNc3ZRbGhOODdOOHI0eHRlNTY3VkR2L2dIZjFPaU01MWZ6YWtJZGtNREhVWlZhcEFsakFKV2s5V0dmNjZpdVk1SVVHQ3lOSElDYklaWGlDS0FBWHhnc2ozQysiLCJtYWMiOiI2ZmY1YjhiYzU5Y2I0NjhlN2E5M2Q2NGZlM2UzY2QyYjg0NGIyNjEwMDQ2MGMwMTY3MTcxZTA2NmJmMGU1OGQ4IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:29:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+set-cookie: XSRF-TOKEN=eyJpdiI6Imc4SUlPZnNHS2Z4SFNGanBtQ3N3cmc9PSIsInZhbHVlIjoibVVTZ3FsNGd1QW1sRFJSQWl5aUNEM056WFlIc0t3djNYNlpjNDdwd3pkM2RTWHo4Qk51WmZnTjVka3RWUy94VTVmM1pVQlcxOHo2K3VZK2ppSEZ3V2Y4aUhnZnZuc1FGSTNJTmswaG9YZnhRWVd2QjdNWDZMSUgzd2dYM1dHQTMiLCJtYWMiOiJhNDlhZWNiNmViM2NkYTE1NWJmYTU5YmIxNmY5N2U0YTgxNGQ4ZWFjYWM3ZjFiODU4MjY3YWJjZTMxNjJjMzg5IiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; samesite=lax; dk-social-commerce-session=eyJpdiI6ImxDdHZVdWNxNHNPY1QwUEpWUURzMHc9PSIsInZhbHVlIjoiYkFnMWhMdDRxWWE3V3BBNEpvT09VT21zTGZ6ak5LbktIWFZWSm5CbFlSeTZkelE1dlgyQWdpdlVBTlNjK2dUZ2M2RDNyNnp5OThJS2VQODdjRkw5VEQzTUxKLzVUZ0RiRnVwdG9CZEdyL3hOSzdDMEE4MUF2ekx6QlphOHhxZ3giLCJtYWMiOiI3ODk2ZjNiZjEzODE1NDdkYTRjNzY2YzEwMDg5YzlmOGY1MjQxNGQ5MzIwMDAwOGQyZDE0YTc0NzBiZDJiMjNjIiwidGFnIjoiIn0%3D; expires=Mon, 07 Sep 2026 13:36:21 GMT; Max-Age=7200; path=/; httponly; samesite=lax
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
