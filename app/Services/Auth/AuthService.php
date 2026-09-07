@@ -90,6 +90,10 @@ class AuthService extends BaseService
     {
         $googleUser = Socialite::driver('google')->user();
 
+        // Calculate referral code before updateOrCreate because Eloquent doesn't evaluate Closures here
+        $existingUser = User::where('email', $googleUser->getEmail())->first();
+        $referralCode = $existingUser ? $existingUser->referral_code : $this->generateUniqueReferralCode();
+
         $user = User::updateOrCreate(
             ['provider_id' => $googleUser->getId(), 'provider' => 'google'],
             [
@@ -97,10 +101,7 @@ class AuthService extends BaseService
                 'email'             => $googleUser->getEmail(),
                 'avatar'            => $googleUser->getAvatar(),
                 'email_verified_at' => now(),
-                'referral_code'     => fn ($attr) =>
-                    User::where('email', $googleUser->getEmail())->exists()
-                        ? User::where('email', $googleUser->getEmail())->value('referral_code')
-                        : $this->generateUniqueReferralCode(),
+                'referral_code'     => $referralCode,
             ]
         );
 

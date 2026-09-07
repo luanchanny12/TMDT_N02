@@ -38,6 +38,7 @@ class GoogleController extends Controller
             return redirect()->route('home')
                 ->with('success', 'Đăng nhập bằng Google thành công!');
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Google Auth Failed: ' . $e->getMessage());
             return redirect()->route('login')
                 ->withErrors(['email' => 'Đăng nhập Google thất bại. Vui lòng thử lại.']);
         }
