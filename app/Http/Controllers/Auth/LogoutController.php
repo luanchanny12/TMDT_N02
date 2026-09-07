@@ -12,6 +12,16 @@ class LogoutController extends Controller
         private AuthService $authService
     ) {}
 
+    /**
+     * Đăng xuất
+     *
+     * Hủy session hiện tại và redirect về trang đăng nhập.
+     *
+     * @group Authentication
+     * @authenticated
+     *
+     * @response 302 scenario="Đăng xuất thành công" {}
+     */
     public function logout(): RedirectResponse
     {
         $this->authService->logout();
