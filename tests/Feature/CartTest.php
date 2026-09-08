@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
-use Darryldecode\Cart\Facades\CartFacade as Cart;
+use App\Models\Cart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -48,9 +48,11 @@ class CartTest extends TestCase
 
         $response->assertRedirect();
 
-        $cartItems = Cart::getContent();
-        $this->assertEquals(1, $cartItems->count());
-        $this->assertEquals($product->name, $cartItems->first()->name);
+        $this->assertDatabaseHas('carts', ['user_id' => $user->id]);
+        $this->assertDatabaseHas('cart_items', [
+            'product_id' => $product->id,
+            'quantity'   => 2,
+        ]);
     }
 
     public function test_adding_same_product_increases_quantity(): void
@@ -61,9 +63,10 @@ class CartTest extends TestCase
         $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 2]);
         $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 3]);
 
-        $cartItems = Cart::getContent();
-        $this->assertEquals(1, $cartItems->count());
-        $this->assertEquals(5, $cartItems->first()->quantity);
+        $this->assertDatabaseHas('cart_items', [
+            'product_id' => $product->id,
+            'quantity'   => 5,
+        ]);
     }
 
     public function test_user_can_remove_item_from_cart(): void
@@ -73,12 +76,11 @@ class CartTest extends TestCase
 
         $this->actingAs($user)->post('/cart/add', ['product_id' => $product->id, 'quantity' => 1]);
 
-        $cartItems = Cart::getContent();
-        $firstItem = $cartItems->first();
+        $cartItem = Cart::where('user_id', $user->id)->first()->items()->first();
 
-        $this->actingAs($user)->post('/cart/remove', ['rowId' => $firstItem->id]);
+        $this->actingAs($user)->post('/cart/remove', ['rowId' => $cartItem->id]);
 
-        $this->assertEquals(0, Cart::getTotalQuantity());
+        $this->assertDatabaseMissing('cart_items', ['id' => $cartItem->id]);
     }
 
     public function test_user_can_clear_cart(): void
@@ -90,6 +92,6 @@ class CartTest extends TestCase
 
         $this->actingAs($user)->post('/cart/clear');
 
-        $this->assertEquals(0, Cart::getTotalQuantity());
+        $this->assertDatabaseMissing('cart_items', ['product_id' => $product->id]);
     }
 }
