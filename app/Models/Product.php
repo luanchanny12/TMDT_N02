@@ -60,7 +60,29 @@ class Product extends Model
         return $this->hasMany(Review::class)->with('user')->latest();
     }
 
-    // ─── Accessors ────────────────────────────────────────────────────────────
+    // ─── Scopes ───────────────────────────────────────────────────────────────
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('stock', '>', 0);
+    }
+
+    // ─── Accessors / Helpers ──────────────────────────────────────────────────
+
+    public function effectivePrice(): int
+    {
+        return $this->sale_price ?? $this->price;
+    }
+
+    public function isOnSale(): bool
+    {
+        return $this->sale_price !== null && $this->sale_price < $this->price;
+    }
 
     public function getImageUrlAttribute(): ?string
     {

@@ -2,73 +2,102 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CartException;
+use App\Services\Cart\CartService;
 use Illuminate\Http\Request;
-use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 class CartController extends Controller
 {
+    public function __construct(
+        private CartService $cartService
+    ) {}
+
     public function index()
     {
-        $cartItems = Cart::getContent();
-        $cartTotal = Cart::getTotal();
+        $cart = $this->cartService->getCartWithItems(auth()->id());
+        $cartItems = $cart->items;
+        $cartTotal = $cart->totalPrice();
 
         return view('cart.index', compact('cartItems', 'cartTotal'));
     }
 
     public function add(Request $request)
     {
-        $product = \App\Models\Product::with('images')->findOrFail($request->product_id);
-
-        Cart::add([
-            'id' => $product->id,
-            'name' => $product->name,
-            'quantity' => $request->quantity ?? 1,
-            'price' => $product->sale_price ?? $product->price,
-            'attributes' => [
-                'image' => $product->image_url,
-                'slug' => $product->slug,
-            ],
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'nullable|integer|min:1'
         ]);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'cartCount' => Cart::getTotalQuantity(),
-            ]);
-        }
+        try {
+            $this->cartService->addItem(
+                auth()->id(), 
+                $request->product_id, 
+                $request->quantity ?? 1
+            );
 
-        return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'cartCount' => $this->cartService->getItemCount(auth()->id()),
+                ]);
+            }
+
+            return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+        } catch (CartException $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+            }
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function update(Request $request)
     {
-        Cart::update($request->rowId, ['quantity' => $request->quantity]);
+        $request->validate([
+            'rowId' => 'required|exists:cart_items,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-        return redirect()->route('cart.index')->with('success', 'Cập nhật giỏ hàng thành công!');
+        try {
+            $this->cartService->updateItem(
+                auth()->id(), 
+                $request->rowId, 
+                $request->quantity
+            );
+            return redirect()->route('cart.index')->with('success', 'Cập nhật giỏ hàng thành công!');
+        } catch (CartException $e) {
+            return redirect()->route('cart.index')->with('error', $e->getMessage());
+        }
     }
 
     public function remove(Request $request)
     {
-        Cart::remove($request->rowId);
+        $request->validate([
+            'rowId' => 'required'
+        ]);
+
+        $this->cartService->removeItem(auth()->id(), $request->rowId);
 
         return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
     public function clear()
     {
-        Cart::clear();
+        $this->cartService->clearCart(auth()->id());
 
         return redirect()->route('cart.index')->with('success', 'Đã xóa toàn bộ giỏ hàng!');
     }
 
     public function checkout()
     {
-        $cartItems = Cart::getContent();
-        $cartTotal = Cart::getTotal();
-
+        $cart = $this->cartService->getCartWithItems(auth()->id());
+        $cartItems = $cart->items;
+        
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
         }
+
+        $cartTotal = $cart->totalPrice();
 
         return view('checkout.index', compact('cartItems', 'cartTotal'));
     }
