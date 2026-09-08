@@ -2,31 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\OrderException;
 use App\Models\Order;
+use App\Services\Order\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private OrderService $orderService
+    ) {}
+
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())
-            ->with('items.product')
-            ->latest()
-            ->paginate(10);
+        $orders = $this->orderService->getOrdersForUser(Auth::id());
 
         return view('orders.index', compact('orders'));
     }
 
-    public function show(Order $order)
+    public function show(int $orderId)
     {
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $order->load('items.product');
+        $order = $this->orderService->getOrderForUser($orderId, Auth::id());
 
         return view('orders.show', compact('order'));
     }
@@ -41,51 +38,24 @@ class OrderController extends Controller
             'payment_method' => 'required|in:cod,vnpay',
         ]);
 
-        $cartItems = Cart::getContent();
-        $cartTotal = Cart::getTotal();
-
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
-        }
-
-        $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(4));
-
-        $order = Order::create([
-            'user_id'          => Auth::id(),
-            'order_code'       => $orderCode,
-            'subtotal'         => $cartTotal,
-            'discount'         => 0,
-            'shipping_fee'     => 0,
-            'total'            => $cartTotal,
-            'shipping_name'    => $validated['shipping_name'],
-            'shipping_phone'   => $validated['shipping_phone'],
-            'shipping_address' => $validated['shipping_address'],
-            'note'             => $validated['shipping_notes'] ?? null,
-            'payment_method'   => $validated['payment_method'],
-            'status'           => 'pending',
-        ]);
-
-        foreach ($cartItems as $item) {
-            $itemSubtotal = $item->price * $item->quantity;
-            $order->items()->create([
-                'product_id'   => $item->id,
-                'product_name' => $item->name,
-                'quantity'     => $item->quantity,
-                'price'        => $item->price,
-                'subtotal'     => $itemSubtotal,
+        try {
+            $order = $this->orderService->placeOrder(Auth::user(), [
+                'shipping_name'    => $validated['shipping_name'],
+                'shipping_phone'   => $validated['shipping_phone'],
+                'shipping_address' => $validated['shipping_address'],
+                'note'             => $validated['shipping_notes'] ?? null,
+                'payment_method'   => $validated['payment_method'],
             ]);
+
+            return redirect()->route('orders.success', $order)->with('success', 'Đặt hàng thành công!');
+        } catch (OrderException $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
-
-        Cart::clear();
-
-        return redirect()->route('orders.success', $order);
     }
 
-    public function success(Order $order)
+    public function success(int $orderId)
     {
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $order = $this->orderService->getOrderForUser($orderId, Auth::id());
 
         return view('orders.success', compact('order'));
     }
