@@ -87,9 +87,9 @@
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">Đơn hàng của bạn</h2>
 
                         <div class="space-y-3 mb-4">
-                            @foreach(Cart::getContent() as $item)
+                            @foreach($cartItems as $item)
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-gray-600">{{ $item->name }} x{{ $item->quantity }}</span>
+                                    <span class="text-gray-600">{{ $item->product->name }} x{{ $item->quantity }}</span>
                                     <span class="font-medium">{{ number_format($item->price * $item->quantity, 0, ',', '.') }} ₫</span>
                                 </div>
                             @endforeach
@@ -98,7 +98,7 @@
                         <div class="border-t pt-3 space-y-2">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tạm tính</span>
-                                <span>{{ number_format(Cart::getSubTotal(), 0, ',', '.') }} ₫</span>
+                                <span>{{ number_format($cartTotal, 0, ',', '.') }} ₫</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Phí vận chuyển</span>
@@ -106,7 +106,7 @@
                             </div>
                             <div class="flex justify-between text-lg font-bold border-t pt-2">
                                 <span>Tổng cộng</span>
-                                <span class="text-[#b8847e]">{{ number_format(Cart::getTotal(), 0, ',', '.') }} ₫</span>
+                                <span class="text-[#b8847e]">{{ number_format($cartTotal, 0, ',', '.') }} ₫</span>
                             </div>
                         </div>
 

@@ -33,6 +33,10 @@ Route::get('/faq', [StaticPageController::class, 'faq'])->name('pages.faq');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// Payments (Public Webhook & Return URL)
+Route::get('/payment/vnpay/return', [\App\Http\Controllers\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
+Route::get('/payment/vnpay/ipn', [\App\Http\Controllers\PaymentController::class, 'vnpayIpn'])->name('payment.vnpay.ipn');
+
 // Auth: Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showForm'])->name('login');
@@ -69,6 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/success', [OrderController::class, 'success'])->name('orders.success');
+
+
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');

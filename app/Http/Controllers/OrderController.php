@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Exceptions\OrderException;
 use App\Models\Order;
 use App\Services\Order\OrderService;
+use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
     public function __construct(
-        private OrderService $orderService
+        private OrderService $orderService,
+        private PaymentService $paymentService
     ) {}
 
     public function index()
@@ -46,6 +48,12 @@ class OrderController extends Controller
                 'note'             => $validated['shipping_notes'] ?? null,
                 'payment_method'   => $validated['payment_method'],
             ]);
+
+            $payment = $this->paymentService->createPayment($order, $request->ip());
+
+            if (isset($payment->redirect_url) && $payment->redirect_url) {
+                return redirect()->away($payment->redirect_url);
+            }
 
             return redirect()->route('orders.success', $order)->with('success', 'Đặt hàng thành công!');
         } catch (OrderException $e) {
