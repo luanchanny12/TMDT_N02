@@ -1,4 +1,4 @@
-<x-layouts.app :title="Cart::getTotalQuantity() > 0 ? 'Giỏ hàng' : 'Giỏ hàng trống'">
+<x-layouts.app :title="$cartItems->isNotEmpty() ? 'Giỏ hàng' : 'Giỏ hàng trống'">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <h1 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
@@ -6,14 +6,14 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
             </svg>
             Giỏ hàng
-            <span class="text-sm font-normal text-gray-500">({{ Cart::getTotalQuantity() }} sản phẩm)</span>
+            <span class="text-sm font-normal text-gray-500">({{ $cartItems->sum('quantity') }} sản phẩm)</span>
         </h1>
 
-        @if(Cart::getTotalQuantity() > 0)
+        @if($cartItems->isNotEmpty())
 
             {{-- Free Shipping Progress --}}
             @php
-                $subtotal = Cart::getSubTotal();
+                $subtotal = $cartTotal;
                 $freeShippingThreshold = 500000;
                 $progress = min(($subtotal / $freeShippingThreshold) * 100, 100);
                 $remaining = max($freeShippingThreshold - $subtotal, 0);
@@ -44,14 +44,14 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {{-- Cart Items --}}
                 <div class="lg:col-span-2 space-y-3">
-                    @foreach(Cart::getContent() as $item)
+                    @foreach($cartItems as $item)
                         <div class="bg-white rounded-xl shadow-sm p-4 animate-fade-in-up">
                             <div class="flex gap-4">
                                 {{-- Image --}}
-                                <a href="{{ route('products.show', $item->attributes->slug ?? $item->id) }}" class="flex-shrink-0">
-                                    @if($item->attributes->image)
-                                        <img src="{{ asset($item->attributes->image) }}"
-                                             alt="{{ $item->name }}" class="h-20 w-20 md:h-24 md:w-24 object-cover rounded-xl">
+                                <a href="{{ route('products.show', $item->product->slug) }}" class="flex-shrink-0">
+                                    @if($item->product->image_url)
+                                        <img src="{{ $item->product->image_url }}"
+                                             alt="{{ $item->product->name }}" class="h-20 w-20 md:h-24 md:w-24 object-cover rounded-xl">
                                     @else
                                         <div class="h-20 w-20 md:h-24 md:w-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
                                             <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,9 +64,9 @@
                                 {{-- Info --}}
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-start justify-between gap-2">
-                                        <a href="{{ route('products.show', $item->attributes->slug ?? $item->id) }}"
+                                        <a href="{{ route('products.show', $item->product->slug) }}"
                                            class="font-semibold text-gray-900 hover:text-[#b8847e] transition-colors line-clamp-2 text-sm">
-                                            {{ $item->name }}
+                                            {{ $item->product->name }}
                                         </a>
                                         <form action="{{ route('cart.remove') }}" method="POST" class="flex-shrink-0"
                                               onsubmit="return confirm('Xóa sản phẩm này?')">
@@ -137,8 +137,8 @@
                         <h2 class="text-lg font-bold text-gray-900 mb-5">Tóm tắt đơn hàng</h2>
                         <div class="space-y-3 mb-5">
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Tạm tính ({{ Cart::getTotalQuantity() }} SP)</span>
-                                <span class="font-semibold text-gray-900">{{ number_format(Cart::getSubTotal(), 0, ',', '.') }}₫</span>
+                                <span class="text-gray-500">Tạm tính ({{ $cartItems->sum('quantity') }} SP)</span>
+                                <span class="font-semibold text-gray-900">{{ number_format($cartTotal, 0, ',', '.') }}₫</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-500">Phí vận chuyển</span>
@@ -153,7 +153,7 @@
                             <div class="flex justify-between items-baseline">
                                 <span class="text-base font-bold text-gray-900">Tổng cộng</span>
                                 <span class="text-xl font-extrabold text-[#b8847e]">
-                                    {{ number_format(Cart::getTotal() + ($subtotal >= $freeShippingThreshold ? 0 : 30000), 0, ',', '.') }}₫
+                                    {{ number_format($cartTotal + ($subtotal >= $freeShippingThreshold ? 0 : 30000), 0, ',', '.') }}₫
                                 </span>
                             </div>
                         </div>

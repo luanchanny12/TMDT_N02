@@ -31,7 +31,7 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.store('cart', { count: {{ auth()->check() ? Cart::getTotalQuantity() : 0 }} });
+            Alpine.store('cart', { count: {{ auth()->check() ? app(\App\Services\Cart\CartService::class)->getItemCount(auth()->id()) : 0 }} });
         });
     </script>
 
