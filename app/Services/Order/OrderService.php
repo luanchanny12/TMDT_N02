@@ -8,13 +8,15 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\BaseService;
 use App\Services\Cart\CartService;
+use App\Services\Referral\ReferralService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OrderService extends BaseService
 {
     public function __construct(
-        private CartService $cartService
+        private CartService $cartService,
+        private ReferralService $referralService
     ) {}
 
     /**
@@ -98,6 +100,9 @@ class OrderService extends BaseService
 
             // 7. Xóa giỏ hàng
             $this->cartService->clearCart($user->id);
+
+            // 8. Lưu vết Referral (nếu có)
+            $this->referralService->attachOrderToReferral($order);
 
             return $order;
         });

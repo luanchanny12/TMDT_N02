@@ -5,8 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Services\Referral\ReferralService;
+
 class ProfileController extends Controller
 {
+    public function __construct(
+        private ReferralService $referralService
+    ) {}
+
     public function index()
     {
         $user = Auth::user();
@@ -16,7 +22,9 @@ class ProfileController extends Controller
             $user->update(['referral_code' => $referralCode]);
         }
 
-        return view('pages.profile', compact('user', 'referralCode'));
+        $stats = $this->referralService->getUserStatistics($user);
+
+        return view('pages.profile', compact('user', 'referralCode', 'stats'));
     }
 
     public function update(Request $request)

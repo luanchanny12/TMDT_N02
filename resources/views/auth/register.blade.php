@@ -117,7 +117,7 @@
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Mã giới thiệu <span class="text-gray-400 font-normal">(tùy chọn)</span></label>
-                                <input type="text" name="referral_code" value="{{ old('referral_code', request('ref')) }}"
+                                <input type="text" name="referral_code" value="{{ old('referral_code', request()->cookie(config('referral.cookie_name', 'referral_code'))) }}"
                                        placeholder="Nhập mã nếu có"
                                        class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent transition-all bg-gray-50 focus:bg-white">
                             </div>
