@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\Referral\ReferralService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private ReferralService $referralService
+    ) {}
     public function index(Request $request)
     {
         $query = Order::with('user');
@@ -38,10 +42,16 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,processing,shipping,completed,cancelled',
+            'status' => 'required|in:pending,confirmed,shipping,delivered,cancelled',
         ]);
 
         $order->update(['status' => $validated['status']]);
+
+        if ($validated['status'] === 'delivered') {
+            $this->referralService->completeReferral($order);
+        } elseif ($validated['status'] === 'cancelled') {
+            $this->referralService->cancelReferral($order);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([

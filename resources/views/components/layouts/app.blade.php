@@ -295,5 +295,6 @@
     @livewire('chatbot-widget')
 
     @livewireScripts
+    @stack('scripts')
 </body>
 </html>

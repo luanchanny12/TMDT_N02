@@ -26,6 +26,10 @@
         </div>
 
         {{-- Status Update --}}
+        <script>
+            window.adminStatusColors = @json($statusColors);
+            window.adminStatusLabels = @json($statusLabels);
+        </script>
         <div class="flex items-center gap-3" x-data="{
             currentStatus: '{{ $order->status }}',
             updating: false,
@@ -50,8 +54,8 @@
                             detail: { message: 'Cập nhật trạng thái thành công!', type: 'success' }
                         }));
                         const badge = document.getElementById('status-badge');
-                        const colors = @json($statusColors);
-                        const labels = @json($statusLabels);
+                        const colors = window.adminStatusColors;
+                        const labels = window.adminStatusLabels;
                         badge.className = 'inline-flex px-3 py-1.5 rounded-full text-sm font-semibold ' + (colors[data.status] || 'bg-gray-100 text-gray-800');
                         badge.textContent = labels[data.status] || data.status;
                     }

@@ -47,8 +47,9 @@ class RegisterController extends Controller
     {
         $user = $this->authService->register($request->validated());
 
-        // Xử lý referral code từ session (được lưu bởi TrackReferral middleware)
-        $referralCode = session()->pull('referral_code');
+        // Ưu tiên form nhập tay, nếu form trống thì lấy từ cookie
+        $referralCode = $request->input('referral_code') ?: request()->cookie(config('referral.cookie_name', 'referral_code'));
+        
         if ($referralCode) {
             $this->referralService->createReferral($user, $referralCode);
         }
@@ -56,7 +57,13 @@ class RegisterController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('home')
+        $response = redirect()->route('home')
             ->with('success', 'Đăng ký thành công! Chào mừng bạn đến với DK Social Commerce.');
+
+        if ($referralCode) {
+            $response->withoutCookie(config('referral.cookie_name', 'referral_code'));
+        }
+
+        return $response;
     }
 }
