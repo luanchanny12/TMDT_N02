@@ -215,29 +215,32 @@
                                         @endif
                                     </td>
                                     <td class="px-5 py-3 text-right">
-                                        <div class="flex items-center justify-end gap-1">
+                                        <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('admin.coupons.usage', $coupon) }}"
-                                               class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-xs transition-colors p-1.5 rounded-lg hover:bg-purple-50"
+                                               class="inline-flex items-center gap-1.5 text-purple-600 hover:text-purple-800 font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-purple-50"
                                                title="Lịch sử sử dụng">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                                 </svg>
+                                                <span class="hidden xl:inline">Sử dụng</span>
                                             </a>
                                             <a href="{{ route('admin.coupons.edit', $coupon) }}"
-                                               class="inline-flex items-center gap-1 text-[#b8847e] hover:text-[#a6736d] font-medium text-xs transition-colors p-1.5 rounded-lg hover:bg-[#faf7f4]"
+                                               class="inline-flex items-center gap-1.5 text-[#b8847e] hover:text-[#a6736d] font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-[#faf7f4]"
                                                title="Sửa">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
+                                                <span class="hidden xl:inline">Sửa</span>
                                             </a>
                                             <form action="{{ route('admin.coupons.toggle', $coupon) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"
-                                                        class="inline-flex items-center gap-1 text-amber-600 hover:text-amber-800 font-medium text-xs transition-colors p-1.5 rounded-lg hover:bg-amber-50"
+                                                        class="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-amber-50"
                                                         title="{{ $coupon->status === 'active' ? 'Tắt' : 'Bật' }}">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                                                     </svg>
+                                                    <span class="hidden xl:inline">{{ $coupon->status === 'active' ? 'Tắt' : 'Bật' }}</span>
                                                 </button>
                                             </form>
                                             <form action="{{ route('admin.coupons.destroy', $coupon) }}" method="POST"
@@ -245,11 +248,12 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                        class="inline-flex items-center gap-1 text-red-500 hover:text-red-700 font-medium text-xs transition-colors p-1.5 rounded-lg hover:bg-red-50"
+                                                        class="inline-flex items-center gap-1.5 text-red-500 hover:text-red-700 font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
                                                         title="Xóa">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
+                                                    <span class="hidden xl:inline">Xóa</span>
                                                 </button>
                                             </form>
                                         </div>
