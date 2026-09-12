@@ -129,7 +129,7 @@
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-[#9a9490] uppercase tracking-wide">Đã dùng</th>
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-[#9a9490] uppercase tracking-wide">Thời hạn</th>
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-[#9a9490] uppercase tracking-wide">Trạng thái</th>
-                                <th class="px-5 py-3 text-right text-xs font-semibold text-[#9a9490] uppercase tracking-wide">Thao tác</th>
+                                <th class="px-5 py-3 text-center text-xs font-semibold text-[#9a9490] uppercase tracking-wide">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#efe8e3]">
@@ -214,8 +214,8 @@
                                             <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Inactive</span>
                                         @endif
                                     </td>
-                                    <td class="px-5 py-3 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                    <td class="px-5 py-3 text-center">
+                                        <div class="flex items-center justify-center gap-2">
                                             <a href="{{ route('admin.coupons.usage', $coupon) }}"
                                                class="inline-flex items-center gap-1.5 text-purple-600 hover:text-purple-800 font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-purple-50"
                                                title="Lịch sử sử dụng">
