@@ -1,4 +1,4 @@
-<div class="fixed bottom-6 right-6 z-50" x-data="{ open: @entangle('isOpen') }">
+<div class="fixed bottom-6 right-6 z-50">
     {{-- Toggle Button --}}
     <button wire:click="toggle"
             class="w-14 h-14 rounded-full bg-gradient-to-br from-[#b8847e] to-[#c9a9a6] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow relative">
@@ -8,15 +8,9 @@
         <span class="absolute -top-1 -right-1 bg-[#faf7f4] text-[#b8847e] text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-[#efe8e3]">AI</span>
     </button>
 
-    {{-- Chat Window --}}
-    <div x-show="open" x-cloak
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-         class="fixed bottom-24 right-6 w-[320px] h-[440px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#efe8e3]">
+    {{-- Chat Window: dùng @if($isOpen) thay vì @entangle để tránh conflict Alpine --}}
+    @if($isOpen)
+    <div class="fixed bottom-24 right-6 w-[320px] h-[440px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#efe8e3]">
 
         {{-- Header --}}
         <div class="bg-gradient-to-br from-[#b8847e] to-[#c9a9a6] text-white px-4 py-3 flex justify-between items-center flex-shrink-0">
@@ -44,15 +38,15 @@
                     <p class="text-[#9a9490] text-xs leading-relaxed">Tôi là trợ lý của SocialShop.<br>Bạn cần giúp gì?</p>
 
                     <div class="flex flex-wrap gap-2 justify-center mt-4">
-                        <button wire:click="$set('message', 'Giá cả'); sendMessage()"
+                        <button wire:click="sendQuick('Giá cả các sản phẩm như thế nào?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
                             💰 Giá cả
                         </button>
-                        <button wire:click="$set('message', 'Giao hàng'); sendMessage()"
+                        <button wire:click="sendQuick('Chính sách giao hàng như thế nào?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
                             🚚 Giao hàng
                         </button>
-                        <button wire:click="$set('message', 'Liên hệ'); sendMessage()"
+                        <button wire:click="sendQuick('Làm thế nào để liên hệ hỗ trợ?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
                             📞 Liên hệ
                         </button>
@@ -70,26 +64,25 @@
                     <div class="{{ $msg['type'] === 'user'
                                     ? 'bg-[#b8847e] text-white rounded-xl rounded-br-sm'
                                     : 'bg-white text-[#3d3d3d] border border-[#efe8e3] rounded-xl rounded-bl-sm' }}
-                                px-3 py-2 max-w-[75%] text-sm leading-relaxed">
+                                px-3 py-2 max-w-[75%] text-sm leading-relaxed whitespace-pre-wrap">
                         {{ $msg['content'] }}
                     </div>
                 </div>
             @endforeach
 
-            @if($isLoading)
-                <div class="flex justify-start">
-                    <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-1">
-                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                    </div>
-                    <div class="bg-white border border-[#efe8e3] rounded-xl rounded-bl-sm px-3 py-2">
-                        <div class="flex gap-1">
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                        </div>
+            {{-- 3 dấu chấm hiện khi Livewire đang xử lý (wire:loading tự động) --}}
+            <div wire:loading wire:target="sendMessage,sendQuick" class="flex justify-start">
+                <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-1">
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                </div>
+                <div class="bg-white border border-[#efe8e3] rounded-xl rounded-bl-sm px-3 py-2">
+                    <div class="flex gap-1 items-center h-4">
+                        <span class="w-1.5 h-1.5 bg-[#b8847e] rounded-full animate-bounce" style="animation-delay:0s"></span>
+                        <span class="w-1.5 h-1.5 bg-[#b8847e] rounded-full animate-bounce" style="animation-delay:.15s"></span>
+                        <span class="w-1.5 h-1.5 bg-[#b8847e] rounded-full animate-bounce" style="animation-delay:.3s"></span>
                     </div>
                 </div>
-            @endif
+            </div>
         </div>
 
         {{-- Input --}}
@@ -99,44 +92,29 @@
                        placeholder="Nhập tin nhắn..."
                        class="flex-1 border border-[#efe8e3] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent bg-[#faf7f4] focus:bg-white transition-all">
                 <button type="submit"
-                        class="bg-[#b8847e] text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[#a6736d] transition-colors flex-shrink-0">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="bg-[#b8847e] text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[#a6736d] transition-colors flex-shrink-0 disabled:opacity-50"
+                        wire:loading.attr="disabled">
+                    <svg wire:loading.remove class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    <svg wire:loading class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
                 </button>
             </div>
         </form>
     </div>
+    @endif
 </div>
 
 @push('scripts')
 <script>
-    Livewire.on('getBotResponse', (message) => {
-        let response = '';
-        const lowerMsg = message.toLowerCase();
-
-        if (lowerMsg.includes('xin chào') || lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
-            response = 'Xin chào! Rất vui được hỗ trợ bạn. Bạn cần tìm sản phẩm nào?';
-        } else if (lowerMsg.includes('giá') || lowerMsg.includes('price')) {
-            response = 'Bạn có thể xem giá sản phẩm trên trang chi tiết sản phẩm. Chúng tôi có nhiều ưu đãi hấp dẫn!';
-        } else if (lowerMsg.includes('giao hàng') || lowerMsg.includes('ship')) {
-            response = 'Chúng tôi giao hàng toàn quốc. Miễn phí ship cho đơn từ 500.000đ!';
-        } else if (lowerMsg.includes('thanh toán') || lowerMsg.includes('payment')) {
-            response = 'Chúng tôi hỗ trợ thanh toán COD và VNPay. Bạn chọn phương thức nào phù hợp nhất!';
-        } else if (lowerMsg.includes('giới thiệu') || lowerMsg.includes('referral')) {
-            response = 'Mã giới thiệu giúp bạn nhận ưu đãi khi bạn bè mua hàng. Xem mã của bạn tại trang Tài khoản!';
-        } else if (lowerMsg.includes('liên hệ')) {
-            response = 'Bạn có thể liên hệ hotline 1900-xxxx-xxx hoặc email support@socialshop.vn. Chúng tôi sẵn sàng hỗ trợ!';
-        } else {
-            response = 'Cảm ơn bạn đã nhắn tin! Hiện tại tôi là trợ lý demo. Vui lòng xem thêm thông tin trên trang web hoặc liên hệ hỗ trợ.';
-        }
-
-        Livewire.dispatch('receiveBotResponse', response);
-    });
-
     Livewire.on('scrollToBottom', () => {
-        const el = document.getElementById('chatMessages');
-        if (el) el.scrollTop = el.scrollHeight;
+        setTimeout(() => {
+            const el = document.getElementById('chatMessages');
+            if (el) el.scrollTop = el.scrollHeight;
+        }, 100);
     });
 </script>
 @endpush

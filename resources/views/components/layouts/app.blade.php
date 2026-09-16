@@ -322,7 +322,7 @@
     </div>
 
     {{-- Chatbot Widget --}}
-    @livewire('chatbot-widget')
+    <livewire:chatbot-widget />
 
     @livewireScripts
     @stack('scripts')
