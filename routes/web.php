@@ -71,6 +71,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
+    // Chat Streaming
+    Route::post('/chat/stream', [\App\Http\Controllers\ChatController::class, 'stream'])->name('chat.stream');
+
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -134,4 +137,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy'])->name('coupons.destroy');
     Route::patch('/coupons/{coupon}/toggle', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle');
     Route::get('/coupons/{coupon}/usage', [AdminCouponController::class, 'usageHistory'])->name('coupons.usage');
+
+    // Chatbot FAQs (specific routes before wildcard)
+    Route::get('/chatbot-faqs', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'index'])->name('chatbot-faqs.index');
+    Route::get('/chatbot-faqs/create', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'create'])->name('chatbot-faqs.create');
+    Route::post('/chatbot-faqs', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'store'])->name('chatbot-faqs.store');
+    Route::get('/chatbot-faqs/{chatbotFaq}/edit', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'edit'])->name('chatbot-faqs.edit');
+    Route::put('/chatbot-faqs/{chatbotFaq}', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'update'])->name('chatbot-faqs.update');
+    Route::delete('/chatbot-faqs/{chatbotFaq}', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'destroy'])->name('chatbot-faqs.destroy');
+    Route::patch('/chatbot-faqs/{chatbotFaq}/toggle', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'toggleStatus'])->name('chatbot-faqs.toggle');
 });
