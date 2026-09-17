@@ -47,7 +47,7 @@ PROMPT;
     public function sendMessage(string $userMessage, array $history = [], ?int $userId = null): string
     {
         if (empty($this->apiKey) || $this->apiKey === 'test') {
-            return $this->fallbackResponse($userMessage);
+            return $this->fallbackResponse($userMessage, $userId);
         }
 
         try {
