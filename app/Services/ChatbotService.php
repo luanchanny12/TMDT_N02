@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\ChatbotFaq;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +17,7 @@ class ChatbotService
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key', '');
-        $this->model = config('services.gemini.model', 'gemini-1.5-flash');
+        $this->model = config('services.gemini.model', 'gemini-3.5-flash');
         $this->systemPrompt = <<<'PROMPT'
 Bạn là trợ lý ảo của SocialShop — cửa hàng trực tuyến bán điện thoại, phụ kiện và đồ công nghệ.
 Hãy trả lời ngắn gọn, thân thiện bằng tiếng Việt.
@@ -26,14 +29,31 @@ Không trả lời các câu hỏi ngoài phạm vi cửa hàng.
 PROMPT;
     }
 
-    public function sendMessage(string $userMessage, array $history = []): string
+    public function getApiKey(): string
+    {
+        return $this->apiKey;
+    }
+
+    public function getModel(): string
+    {
+        return $this->model;
+    }
+
+    public function getSystemPrompt(): string
+    {
+        return $this->systemPrompt;
+    }
+
+    public function sendMessage(string $userMessage, array $history = [], ?int $userId = null): string
     {
         if (empty($this->apiKey) || $this->apiKey === 'test') {
             return $this->fallbackResponse($userMessage);
         }
 
         try {
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
+            $contextParts = $this->buildContext($userMessage, $userId);
+
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
 
             $contents = [];
 
@@ -51,7 +71,7 @@ PROMPT;
 
             $payload = [
                 'systemInstruction' => [
-                    'parts' => [['text' => $this->systemPrompt]],
+                    'parts' => [['text' => $this->systemPrompt . $contextParts]],
                 ],
                 'contents' => $contents,
                 'generationConfig' => [
@@ -60,7 +80,14 @@ PROMPT;
                 ],
             ];
 
-            $response = Http::timeout(15)->post($url, $payload);
+            $response = Http::timeout(15)
+                ->withHeaders(['x-goog-api-key' => $this->apiKey])
+                ->post($url, $payload);
+
+            if ($response->status() === 429) {
+                Log::warning('Gemini rate limited', ['status' => 429]);
+                return $this->fallbackResponse($userMessage, $userId);
+            }
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -70,17 +97,214 @@ PROMPT;
 
             Log::warning('Gemini API error', ['status' => $response->status(), 'body' => $response->body()]);
 
-            return $this->fallbackResponse($userMessage);
+            return $this->fallbackResponse($userMessage, $userId);
         } catch (\Exception $e) {
             Log::error('Gemini API exception', ['message' => $e->getMessage()]);
 
-            return $this->fallbackResponse($userMessage);
+            return $this->fallbackResponse($userMessage, $userId);
         }
     }
 
-    private function fallbackResponse(string $message): string
+    public function buildContext(string $userMessage, ?int $userId = null): string
+    {
+        $context = '';
+
+        $faqs = $this->searchFaqs($userMessage);
+        if (!empty($faqs)) {
+            $context .= "\n\n[Hãy ưu tiên trả lời dựa trên thông tin FAQ sau]";
+            foreach ($faqs as $faq) {
+                $context .= "\n- Q: {$faq['question']}\n  A: {$faq['answer']}";
+            }
+        }
+
+        $products = $this->searchProducts($userMessage);
+        if (!empty($products)) {
+            $context .= "\n\n[Thông tin sản phẩm tìm thấy]";
+            foreach ($products as $p) {
+                $stock = $p['in_stock'] ? 'còn hàng' : 'hết hàng';
+                $context .= "\n- {$p['name']} | Giá: {$p['price']} | Danh mục: {$p['category']} | {$stock}";
+            }
+        }
+
+        if ($userId) {
+            $orderInfo = $this->getUserOrderInfo($userId, $userMessage);
+            if (!empty($orderInfo)) {
+                $context .= "\n\n[Thông tin đơn hàng của khách]";
+                $context .= "\n{$orderInfo}";
+            }
+        }
+
+        return $context;
+    }
+
+    public function searchProducts(string $query): array
+    {
+        $productKeywords = ['giá', 'price', 'bao nhiêu', 'còn hàng', 'hết hàng', 'có không', 'sản phẩm', 'điện thoại', 'phụ kiện', 'case', 'ốp', 'tai nghe', 'sạc', 'cáp'];
+
+        $hasProductKeyword = false;
+        foreach ($productKeywords as $kw) {
+            if (mb_stripos($query, $kw) !== false) {
+                $hasProductKeyword = true;
+                break;
+            }
+        }
+
+        if (!$hasProductKeyword) {
+            return [];
+        }
+
+        $cleanQuery = mb_strtolower($query);
+        $cleanQuery = str_replace(['giá', 'price', 'bao nhiêu', 'tiền', 'còn hàng', 'hết hàng', 'có không', 'không', 'sản phẩm', 'điện thoại', 'phụ kiện', 'bao钱'], '', $cleanQuery);
+        $cleanQuery = preg_replace('/\s+/', ' ', trim($cleanQuery));
+
+        if (empty($cleanQuery)) {
+            return Product::where('status', 'active')
+                ->with('category')
+                ->limit(5)
+                ->get()
+                ->map(fn($p) => [
+                    'name' => $p->name,
+                    'price' => number_format($p->sale_price ?? $p->price) . 'đ',
+                    'category' => $p->category->name ?? 'N/A',
+                    'in_stock' => $p->stock > 0,
+                ])
+                ->toArray();
+        }
+
+        return Product::where('status', 'active')
+            ->where(function ($q) use ($cleanQuery) {
+                $q->where('name', 'LIKE', "%{$cleanQuery}%")
+                  ->orWhere('brand', 'LIKE', "%{$cleanQuery}%")
+                  ->orWhere('description', 'LIKE', "%{$cleanQuery}%");
+            })
+            ->with('category')
+            ->limit(5)
+            ->get()
+            ->map(fn($p) => [
+                'name' => $p->name,
+                'price' => number_format($p->sale_price ?? $p->price) . 'đ',
+                'category' => $p->category->name ?? 'N/A',
+                'in_stock' => $p->stock > 0,
+            ])
+            ->toArray();
+    }
+
+    public function searchFaqs(string $query): array
+    {
+        $activeFaqs = ChatbotFaq::active()->orderBy('sort_order')->get();
+
+        $scored = [];
+
+        foreach ($activeFaqs as $faq) {
+            $queryLower = mb_strtolower($query);
+            $questionLower = mb_strtolower($faq->question);
+            $score = 0;
+
+            if ($faq->keywords) {
+                $keywords = array_map('trim', explode(',', $faq->keywords));
+                foreach ($keywords as $kw) {
+                    if (mb_stripos($queryLower, mb_strtolower($kw)) !== false) {
+                        $score = 10;
+                        break;
+                    }
+                }
+            }
+
+            if ($score === 0) {
+                $queryWords = explode(' ', $queryLower);
+                foreach ($queryWords as $word) {
+                    if (mb_strlen($word) < 3) continue;
+                    if (mb_stripos($questionLower, $word) !== false) {
+                        $score = max($score, 3);
+                    }
+                }
+            }
+
+            if ($score > 0) {
+                $scored[] = ['faq' => $faq, 'score' => $score];
+            }
+        }
+
+        usort($scored, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        return array_values(array_slice(array_map(fn($s) => [
+            'question' => $s['faq']->question,
+            'answer' => $s['faq']->answer,
+        ], $scored), 0, 3));
+    }
+
+    public function getUserOrderInfo(int $userId, string $query): string
+    {
+        $orderKeywords = ['đơn hàng', 'đơn', 'order', 'tình trạng', 'đã giao', 'chưa giao', 'giao đến đâu', 'tracking', 'mã đơn'];
+        $hasOrderKeyword = false;
+
+        foreach ($orderKeywords as $kw) {
+            if (mb_stripos($query, $kw) !== false) {
+                $hasOrderKeyword = true;
+                break;
+            }
+        }
+
+        if (!$hasOrderKeyword) {
+            return '';
+        }
+
+        $orderCode = null;
+        if (preg_match('/(ORD-\d{8}-\w{3,4})/i', $query, $m)) {
+            $orderCode = $m[1];
+        }
+
+        $order = Order::where('user_id', $userId)
+            ->when($orderCode, fn($q) => $q->where('order_code', $orderCode))
+            ->with('items')
+            ->latest()
+            ->first();
+
+        if (!$order) {
+            return 'Không tìm thấy đơn hàng nào.';
+        }
+
+        $statusMap = [
+            'pending'    => 'Chờ xác nhận',
+            'confirmed'  => 'Đã xác nhận',
+            'shipping'   => 'Đang giao hàng',
+            'delivered'  => 'Đã giao hàng',
+            'cancelled'  => 'Đã hủy',
+        ];
+
+        $items = $order->items->map(fn($i) => "{$i->product_name} x{$i->quantity}")->implode(', ');
+
+        return "Mã đơn: {$order->order_code} | Trạng thái: " . ($statusMap[$order->status] ?? $order->status)
+            . " | Tổng: " . number_format($order->total) . "đ"
+            . " | Sản phẩm: {$items}";
+    }
+
+    public function fallbackResponse(string $message, ?int $userId = null): string
     {
         $lower = mb_strtolower($message);
+
+        if ($userId) {
+            $orderInfo = $this->getUserOrderInfo($userId, $message);
+            if (!empty($orderInfo)) {
+                return $orderInfo;
+            }
+        }
+
+        $products = $this->searchProducts($message);
+        if (!empty($products)) {
+            $lines = [];
+            foreach ($products as $p) {
+                $stock = $p['in_stock'] ? 'còn hàng' : 'hết hàng';
+                $lines[] = "- {$p['name']}: {$p['price']} ({$stock})";
+            }
+            return "Các sản phẩm tìm thấy:\n" . implode("\n", $lines)
+                . "\nBạn có thể xem chi tiết tại trang sản phẩm.";
+        }
+
+        $faqs = $this->searchFaqs($message);
+        if (!empty($faqs)) {
+            return $faqs[0]['answer'];
+        }
 
         return match (true) {
             str_contains($lower, 'xin chào') || str_contains($lower, 'hello') || str_contains($lower, 'hi')

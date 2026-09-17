@@ -131,5 +131,8 @@ class DatabaseSeeder extends Seeder
 
         // Coupons
         $this->call(CouponSeeder::class);
+
+        // Chatbot FAQs
+        $this->call(ChatbotFaqSeeder::class);
     }
 }

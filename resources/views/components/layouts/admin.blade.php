@@ -91,6 +91,14 @@
                     Mã giảm giá
                 </a>
 
+                <a href="{{ route('admin.chatbot-faqs.index') }}"
+                   class="flex items-center px-4 py-3 {{ request()->routeIs('admin.chatbot-faqs.*') ? 'bg-indigo-800' : 'hover:bg-indigo-600' }}">
+                    <svg class="h-5 w-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    Chatbot FAQ
+                </a>
+
                 <div class="border-t border-indigo-600 mt-4 pt-4">
                     <a href="{{ route('home') }}"
                        class="flex items-center px-4 py-3 hover:bg-indigo-600">

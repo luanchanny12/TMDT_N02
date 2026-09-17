@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Services\ChatbotService;
 use Livewire\Component;
 
 class ChatbotWidget extends Component
@@ -12,12 +11,16 @@ class ChatbotWidget extends Component
     public $messages = [];
     public $isLoading = false;
 
+    protected $listeners = [
+        'receiveBotResponse',
+    ];
+
     public function toggle()
     {
         $this->isOpen = !$this->isOpen;
     }
 
-    public function sendMessage(ChatbotService $chatbot)
+    public function sendMessage()
     {
         if (empty(trim($this->message))) {
             return;
@@ -31,19 +34,18 @@ class ChatbotWidget extends Component
             'content' => $userMessage,
         ];
 
-        $history = array_map(fn ($m) => [
-            'type'    => $m['type'],
-            'content' => $m['content'],
-        ], $this->messages);
+        $this->dispatch('startStreaming', message: $userMessage, history: $this->messages);
+        $this->dispatch('scrollToBottom');
+    }
 
-        $response = $chatbot->sendMessage($userMessage, $history);
-
+    public function receiveBotResponse($response)
+    {
         $this->messages[] = [
             'type'    => 'bot',
             'content' => $response,
         ];
-
         $this->isLoading = false;
+        $this->dispatch('scrollToBottom');
     }
 
     public function render()
