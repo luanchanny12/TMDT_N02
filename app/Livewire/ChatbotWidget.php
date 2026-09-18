@@ -20,6 +20,12 @@ class ChatbotWidget extends Component
         $this->isOpen = !$this->isOpen;
     }
 
+    public function sendQuick(string $text): void
+    {
+        $this->message = $text;
+        $this->sendMessage();
+    }
+
     public function sendMessage()
     {
         if (empty(trim($this->message))) {
