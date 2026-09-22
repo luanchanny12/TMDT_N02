@@ -42,6 +42,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
     @livewireStyles
+    @stack('styles')
     <style>
         :root {
             --cream: #faf7f4;
