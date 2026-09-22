@@ -15,8 +15,8 @@
         {{-- Header --}}
         <div class="bg-gradient-to-br from-[#b8847e] to-[#c9a9a6] text-white px-4 py-3 flex justify-between items-center flex-shrink-0">
             <div>
-                <h3 class="font-serif font-semibold text-sm">Tro ly SocialShop</h3>
-                <p class="text-white/70 text-[11px]">Ho tro 24/7</p>
+                <h3 class="font-serif font-semibold text-sm">Trợ lý SocialShop</h3>
+                <p class="text-white/70 text-[11px]">Hỗ trợ 24/7</p>
             </div>
             <button wire:click="toggle" class="text-white/80 hover:text-white transition-colors p-1">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,21 +34,21 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
                     </div>
-                    <p class="text-[#3d3d3d] font-medium text-sm mb-1">Xin chao!</p>
-                    <p class="text-[#9a9490] text-xs leading-relaxed">Toi la tro ly cua SocialShop.<br>Ban can giup gi?</p>
+                    <p class="text-[#3d3d3d] font-medium text-sm mb-1">Xin chào!</p>
+                    <p class="text-[#9a9490] text-xs leading-relaxed">Tôi là trợ lý của SocialShop.<br>Bạn cần giúp gì?</p>
 
                     <div class="flex flex-wrap gap-2 justify-center mt-4">
-                        <button wire:click="sendQuick('Gia ca cac san pham nhu the nao?')"
+                        <button wire:click="sendQuick('Giá cả các sản phẩm như thế nào?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
-                            Gia ca
+                            Giá cả
                         </button>
-                        <button wire:click="sendQuick('Chinh sach giao hang nhu the nao?')"
+                        <button wire:click="sendQuick('Chính sách giao hàng như thế nào?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
-                            Giao hang
+                            Giao hàng
                         </button>
-                        <button wire:click="sendQuick('Lam the nao de lien he ho tro?')"
+                        <button wire:click="sendQuick('Làm thế nào để liên hệ hỗ trợ?')"
                                 class="bg-white text-[#b8847e] text-xs font-medium px-3 py-1.5 rounded-full border border-[#efe8e3] hover:bg-[#e8c4c4] hover:text-[#3d3d3d] hover:border-[#e8c4c4] transition-colors cursor-pointer">
-                            Lien he
+                            Liên hệ
                         </button>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
         <form wire:submit.prevent="sendMessage" class="border-t border-[#efe8e3] p-3 flex-shrink-0 bg-white">
             <div class="flex gap-2 items-center">
                 <input type="text" wire:model="message"
-                       placeholder="Nhap tin nhan..."
+                       placeholder="Nhập tin nhắn..."
                        class="flex-1 border border-[#efe8e3] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent bg-[#faf7f4] focus:bg-white transition-all">
                 <button type="submit"
                         class="bg-[#b8847e] text-white w-9 h-9 rounded-lg flex items-center justify-center hover:bg-[#a6736d] transition-colors flex-shrink-0 disabled:opacity-50"
@@ -160,7 +160,7 @@
             finalized = true;
 
             if (!fullText) {
-                fullText = 'Xin loi, co loi xay ra. Vui long thu lai.';
+                fullText = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.';
             }
             Livewire.dispatch('receiveBotResponse', fullText);
         }
@@ -231,7 +231,7 @@
             read();
         }).catch(() => {
             if (!fullText) {
-                fullText = 'Xin loi, co loi xay ra. Vui long thu lai.';
+                fullText = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.';
                 if (bubble) bubble.textContent = fullText;
             }
             finalizeStream();
