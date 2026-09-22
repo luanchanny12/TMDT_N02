@@ -10,7 +10,7 @@
 
     {{-- Chat Window: dung @if($isOpen) thay vi @entangle de tranh conflict Alpine --}}
     @if($isOpen)
-    <div class="fixed bottom-24 right-6 w-[320px] h-[440px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#efe8e3]">
+    <div class="fixed bottom-24 right-6 w-[320px] max-h-[440px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#efe8e3]">
 
         {{-- Header --}}
         <div class="bg-gradient-to-br from-[#b8847e] to-[#c9a9a6] text-white px-4 py-3 flex justify-between items-center flex-shrink-0">
@@ -26,7 +26,7 @@
         </div>
 
         {{-- Messages --}}
-        <div class="flex-1 flex flex-col overflow-y-auto p-3 bg-[#faf7f4]" id="chatMessages">
+        <div class="flex flex-col overflow-y-auto max-h-[320px] p-3 bg-[#faf7f4]" id="chatMessages">
             @if(empty($messages))
                 <div class="text-center py-4">
                     <div class="w-12 h-12 bg-[#f5f0ec] rounded-full flex items-center justify-center mx-auto mb-3">
@@ -64,10 +64,7 @@
                     @endif
                     <div class="{{ $msg['type'] === 'user'
                                     ? 'bg-[#b8847e] text-white rounded-xl rounded-br-sm'
-                                    : 'bg-white text-[#3d3d3d] border border-[#efe8e3] rounded-xl rounded-bl-sm' }}
-                                px-3 py-2 max-w-[75%] text-sm leading-relaxed whitespace-pre-wrap">
-                        {{ $msg['content'] }}
-                    </div>
+                                    : 'bg-white text-[#3d3d3d] border border-[#efe8e3] rounded-xl rounded-bl-sm' }} px-3 py-2 max-w-[75%] text-sm leading-relaxed whitespace-pre-wrap">{{ $msg['content'] }}</div>
                 </div>
             @endforeach
             </div>

@@ -46,10 +46,13 @@ class ChatbotWidget extends Component
 
     public function receiveBotResponse($response)
     {
-        $this->messages[] = [
-            'type'    => 'bot',
-            'content' => $response,
-        ];
+        $content = trim((string) $response);
+        if ($content !== '') {
+            $this->messages[] = [
+                'type'    => 'bot',
+                'content' => $content,
+            ];
+        }
         $this->isLoading = false;
         $this->dispatch('scrollToBottom');
     }
