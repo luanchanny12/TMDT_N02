@@ -197,7 +197,6 @@ PROMPT;
 
         foreach ($activeFaqs as $faq) {
             $queryLower = mb_strtolower($query);
-            $questionLower = mb_strtolower($faq->question);
             $score = 0;
 
             if ($faq->keywords) {
@@ -206,16 +205,6 @@ PROMPT;
                     if (mb_stripos($queryLower, mb_strtolower($kw)) !== false) {
                         $score = 10;
                         break;
-                    }
-                }
-            }
-
-            if ($score === 0) {
-                $queryWords = explode(' ', $queryLower);
-                foreach ($queryWords as $word) {
-                    if (mb_strlen($word) < 3) continue;
-                    if (mb_stripos($questionLower, $word) !== false) {
-                        $score = max($score, 3);
                     }
                 }
             }
@@ -304,6 +293,13 @@ PROMPT;
         $faqs = $this->searchFaqs($message);
         if (!empty($faqs)) {
             return $faqs[0]['answer'];
+        }
+
+        $priceWords = ['giá', 'giá cả', 'bao nhiêu', 'price', 'cost', 'tiền'];
+        foreach ($priceWords as $pw) {
+            if (str_contains($lower, $pw)) {
+                return 'Bạn có thể xem giá chi tiết từng sản phẩm tại trang Sản phẩm. Shop có nhiều sản phẩm từ 150.000đ đến 37.000.000đ!';
+            }
         }
 
         return match (true) {
