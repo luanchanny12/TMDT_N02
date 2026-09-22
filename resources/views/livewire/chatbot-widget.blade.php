@@ -26,7 +26,7 @@
         </div>
 
         {{-- Messages --}}
-        <div class="flex-1 overflow-y-auto p-4 space-y-2 bg-[#faf7f4]" id="chatMessages">
+        <div class="flex-1 overflow-y-auto p-3 space-y-1 bg-[#faf7f4]" id="chatMessages">
             @if(empty($messages))
                 <div class="text-center py-4">
                     <div class="w-12 h-12 bg-[#f5f0ec] rounded-full flex items-center justify-center mx-auto mb-3">
@@ -57,7 +57,7 @@
             @foreach($messages as $msg)
                 <div class="{{ $msg['type'] === 'user' ? 'flex justify-end' : 'flex justify-start' }}">
                     @if($msg['type'] !== 'user')
-                        <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5">
+                        <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2">
                             <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         </div>
                     @endif
@@ -139,7 +139,7 @@
         wrapper.className = 'flex justify-start';
         wrapper.id = 'streamingWrapper';
         wrapper.innerHTML = `
-            <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5">
+            <div class="w-6 h-6 bg-[#b8847e] rounded-full flex items-center justify-center flex-shrink-0 mr-2">
                 <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             </div>
             <div class="bg-white text-[#3d3d3d] border border-[#efe8e3] rounded-xl rounded-bl-sm px-3 py-2 max-w-[75%] text-sm leading-relaxed" id="streamingBubble">
