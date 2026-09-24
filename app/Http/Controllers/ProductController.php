@@ -67,6 +67,51 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'categories'));
     }
 
+    public function category(Request $request, Category $category)
+    {
+        if ($category->status !== 'active') {
+            abort(404);
+        }
+
+        $categoryIds = $this->categoryIdsWithDescendants($category);
+
+        $query = Product::with('category')
+            ->where('status', 'active')
+            ->whereIn('category_id', $categoryIds);
+
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        $this->applySort($query, $request->get('sort', 'latest'));
+
+        $products = $query->paginate(12)->withQueryString();
+
+        $childCategories = $category->children()
+            ->where('status', 'active')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $parent = $category->parent_id
+            ? Category::where('status', 'active')->find($category->parent_id)
+            : null;
+
+        $metaTitle = $category->name . ' - SocialShop';
+        $metaDescription = $category->description
+            ? Str::limit(strip_tags($category->description), 160)
+            : 'Mua sắm ' . $category->name . ' tại SocialShop — nhiều mẫu mã, giá tốt.';
+
+        return view('categories.show', compact(
+            'category', 'products', 'childCategories', 'parent',
+            'metaTitle', 'metaDescription'
+        ));
+    }
+
     public function show(Product $product)
     {
         if ($product->status !== 'active') {
@@ -136,5 +181,45 @@ class ProductController extends Controller
             'product', 'relatedProducts', 'reviews', 'canReview', 'hasReviewed',
             'metaTitle', 'metaDescription', 'metaImage', 'jsonLd'
         ));
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function categoryIdsWithDescendants(Category $category): array
+    {
+        $ids   = [(int) $category->id];
+        $queue = [(int) $category->id];
+
+        while ($queue) {
+            $children = Category::query()
+                ->where('status', 'active')
+                ->whereIn('parent_id', $queue)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            $queue = array_values(array_diff($children, $ids));
+            $ids   = array_merge($ids, $queue);
+        }
+
+        return $ids;
+    }
+
+    private function applySort($query, string $sortBy): void
+    {
+        switch ($sortBy) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            default:
+                $query->latest();
+        }
     }
 }

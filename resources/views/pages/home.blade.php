@@ -32,7 +32,7 @@
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
                 @foreach($categories->take(8) as $category)
-                    <a href="{{ route('products.index', ['category' => $category->id]) }}"
+                    <a href="{{ route('categories.show', $category) }}"
                        class="block text-center bg-white border border-[#efe8e3] rounded-xl py-3.5 px-4 text-[#3d3d3d] font-medium text-sm hover:bg-[#e8c4c4] hover:border-[#e8c4c4] hover:text-[#3d3d3d] transition-colors">
                         {{ $category->name }}
                     </a>

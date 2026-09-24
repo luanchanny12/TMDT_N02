@@ -113,7 +113,7 @@
                             <div class="w-64 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-[#efe8e3] py-2">
                                 @forelse(($navCategories ?? collect()) as $parent)
                                     <div class="px-4 py-1.5">
-                                        <a href="{{ route('products.index', ['category' => $parent->id]) }}"
+                                        <a href="{{ route('categories.show', $parent) }}"
                                            class="block text-sm font-semibold text-[#3d3d3d] hover:text-[#b8847e] transition-colors">
                                             {{ $parent->name }}
                                         </a>
@@ -121,7 +121,7 @@
                                             <ul class="mt-1 space-y-0.5 border-l border-[#efe8e3] pl-3">
                                                 @foreach($parent->children as $child)
                                                     <li>
-                                                        <a href="{{ route('products.index', ['category' => $child->id]) }}"
+                                                        <a href="{{ route('categories.show', $child) }}"
                                                            class="block text-sm text-[#5a5550] hover:text-[#b8847e] transition-colors py-0.5">
                                                             {{ $child->name }}
                                                         </a>
@@ -148,7 +148,7 @@
                             @forelse(($navCategories ?? collect()) as $parent)
                                 <div class="border-b border-[#efe8e3] last:border-b-0">
                                     <div class="flex items-center">
-                                        <a href="{{ route('products.index', ['category' => $parent->id]) }}"
+                                        <a href="{{ route('categories.show', $parent) }}"
                                            class="flex-1 px-4 py-2.5 text-sm font-semibold text-[#3d3d3d] hover:text-[#b8847e] transition-colors">
                                             {{ $parent->name }}
                                         </a>
@@ -171,7 +171,7 @@
                                             class="bg-[#faf7f4] border-t border-[#efe8e3]">
                                             @foreach($parent->children as $child)
                                                 <li>
-                                                    <a href="{{ route('products.index', ['category' => $child->id]) }}"
+                                                    <a href="{{ route('categories.show', $child) }}"
                                                        class="block pl-8 pr-4 py-2 text-sm text-[#5a5550] hover:text-[#b8847e] hover:bg-white transition-colors">
                                                         {{ $child->name }}
                                                     </a>

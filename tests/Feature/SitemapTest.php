@@ -40,4 +40,18 @@ class SitemapTest extends TestCase
             ->assertSee('chinh-sach-bao-mat')
             ->assertSee('faq');
     }
+
+    public function test_sitemap_contains_category_slug_urls(): void
+    {
+        Category::factory()->create([
+            'slug'      => 'danh-muc-sitemap-test',
+            'parent_id' => null,
+            'status'    => 'active',
+        ]);
+
+        $this->get('/sitemap.xml')
+            ->assertOk()
+            ->assertSee('/danh-muc/danh-muc-sitemap-test')
+            ->assertDontSee('/products?category=');
+    }
 }
