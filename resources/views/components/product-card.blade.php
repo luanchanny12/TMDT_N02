@@ -13,7 +13,7 @@
     $isWishlisted = in_array($product->id, $wishlistIds);
 @endphp
 
-<div class="group bg-white rounded-xl shadow-sm border border-[#efe8e3] overflow-hidden hover-lift relative animate-fade-in-up"
+<div class="flex flex-col h-full group bg-white rounded-xl shadow-sm border border-[#efe8e3] overflow-hidden hover-lift relative animate-fade-in-up"
      x-data="{ cartLoading: false, wishlistLoading: false, wishlisted: {{ $isWishlisted ? 'true' : 'false' }} }">
 
     {{-- Discount Badge --}}
@@ -77,7 +77,7 @@
     </a>
 
     {{-- Content --}}
-    <div class="p-3">
+    <div class="p-3 flex flex-col flex-1">
         {{-- Category --}}
         @if($product->category ?? false)
             <span class="inline-block text-[11px] font-medium text-[#b8847e] bg-[#faf7f4] px-2 py-0.5 rounded-full mb-1.5">
@@ -93,19 +93,17 @@
         </a>
 
         {{-- Price + Badge --}}
-        <div class="flex items-center gap-2 mb-1">
+        <div class="flex flex-wrap items-end gap-2 mb-1 min-h-[28px]">
             <span class="text-lg font-extrabold text-[#b8847e] leading-tight">
                 {{ number_format($displayPrice, 0, ',', '.') }}₫
             </span>
             @if($discountPercent > 0)
-                <span class="inline-flex items-center bg-[#fdf2f0] text-[#c0392b] text-[10px] font-bold px-1.5 py-0.5 rounded">
+                <span class="text-xs text-gray-400 line-through mb-[2px]">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                <span class="inline-flex items-center bg-[#fdf2f0] text-[#c0392b] text-[10px] font-bold px-1.5 py-0.5 rounded mb-[2px]">
                     -{{ $discountPercent }}%
                 </span>
             @endif
         </div>
-        @if($discountPercent > 0)
-            <p class="text-xs text-gray-400 line-through mb-1">{{ number_format($product->price, 0, ',', '.') }}₫</p>
-        @endif
 
         {{-- Sold Progress Bar --}}
         <div class="sold-progress mb-1.5">
@@ -131,7 +129,7 @@
 
         {{-- Add to Cart Button (AJAX) --}}
         @if($product->stock > 0)
-            <div class="card-action mt-2">
+            <div class="card-action mt-auto pt-2">
                 <button type="button"
                         @click="
                             cartLoading = true;

@@ -8,4 +8,4 @@ document.addEventListener('alpine:init', () => {
     Alpine.plugin(collapse);
 });
 
-Alpine.start();
+// Alpine được Livewire tự động khởi tạo nên không gọi Alpine.start() ở đây nữa
