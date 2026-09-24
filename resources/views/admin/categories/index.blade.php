@@ -4,12 +4,14 @@
         editing: null,
         formName: '',
         formSortOrder: 0,
+        formParentId: '',
         formPreview: '',
         formErrors: {},
         openCreate() {
             this.editing = null;
             this.formName = '';
             this.formSortOrder = 0;
+            this.formParentId = '';
             this.formPreview = '';
             this.formErrors = {};
             this.showModal = true;
@@ -18,6 +20,7 @@
             this.editing = cat;
             this.formName = cat.name;
             this.formSortOrder = cat.sort_order;
+            this.formParentId = cat.parent_id != null ? String(cat.parent_id) : '';
             this.formPreview = cat.image ? '{{ asset('storage/') }}/' + cat.image : '';
             this.formErrors = {};
             this.showModal = true;
@@ -80,6 +83,9 @@
                                         <div>
                                             <p class="font-semibold text-[#3d3d3d]">{{ $cat->name }}</p>
                                             <p class="text-xs text-[#9a9490]">{{ $cat->slug }}</p>
+                                            @if($cat->parent)
+                                                <p class="text-xs text-[#b8847e]">Cha: {{ $cat->parent->name }}</p>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -202,6 +208,26 @@
                     <input type="text" name="name" x-model="formName" required
                            placeholder="Nhập tên danh mục..."
                            class="w-full border border-[#efe8e3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent transition-all">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- Parent Category --}}
+                <div>
+                    <label class="block text-sm font-medium text-[#3d3d3d] mb-1.5">Danh mục cha</label>
+                    <select name="parent_id" x-model="formParentId"
+                            class="w-full border border-[#efe8e3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent transition-all bg-white">
+                        <option value="">— Không (danh mục cấp 1) —</option>
+                        @foreach($categories as $catOption)
+                            @if($catOption->parent_id === null)
+                                <option value="{{ $catOption->id }}"
+                                        :disabled="editing && Number(editing.id) === {{ $catOption->id }}">
+                                    {{ $catOption->name }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                    @error('parent_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <p class="text-xs text-[#9a9490] mt-1">Chỉ chọn danh mục cấp 1 (tối đa 2 cấp).</p>
                 </div>
 
                 {{-- Image --}}
@@ -221,6 +247,7 @@
                     <label class="block text-sm font-medium text-[#3d3d3d] mb-1.5">Thứ tự hiển thị</label>
                     <input type="number" name="sort_order" x-model="formSortOrder" min="0"
                            class="w-full border border-[#efe8e3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#c9a9a6] focus:border-transparent transition-all">
+                    @error('sort_order') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 {{-- Actions --}}
