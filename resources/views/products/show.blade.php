@@ -18,14 +18,53 @@
         <div class="bg-white border border-[#efe8e3] rounded-2xl overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
 
-                {{-- Image --}}
+                {{-- Gallery --}}
                 <div class="bg-[#f5f0ec] p-6">
-                    @if($product->image_url)
-                        <div class="rounded-xl overflow-hidden">
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
-                                 class="w-full h-[350px] md:h-[420px] object-cover">
+                    @php
+                        $galleryImages = $product->images->map(fn ($img) => [
+                            'src' => $img->url,
+                            'alt' => $product->name,
+                        ]);
+
+                        // Fallback: nếu không có ảnh nào trong product_images
+                        if ($galleryImages->isEmpty() && $product->getRawOriginal('image_url')) {
+                            $galleryImages = collect([['src' => $product->image_url, 'alt' => $product->name]]);
+                        }
+
+                        $firstImage = $galleryImages->first();
+                    @endphp
+
+                    @if($firstImage)
+                        <div x-data="{ current: {{ json_encode($firstImage['src']) }} }">
+
+                            {{-- Ảnh chính --}}
+                            <div class="rounded-xl overflow-hidden mb-3">
+                                <img :src="current"
+                                     :alt="{{ json_encode($product->name) }}"
+                                     class="w-full h-[350px] md:h-[420px] object-cover transition-opacity duration-200">
+                            </div>
+
+                            {{-- Thumbnails (chỉ hiển thị nếu có ≥ 2 ảnh) --}}
+                            @if($galleryImages->count() > 1)
+                                <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                                    @foreach($galleryImages as $i => $img)
+                                        <button type="button"
+                                                @click="current = {{ json_encode($img['src']) }}"
+                                                :class="current === {{ json_encode($img['src']) }}
+                                                    ? 'ring-2 ring-[#b8847e] ring-offset-1 opacity-100'
+                                                    : 'opacity-60 hover:opacity-90'"
+                                                class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-150">
+                                            <img src="{{ $img['src'] }}"
+                                                 alt="{{ $product->name }} - ảnh {{ $i + 1 }}"
+                                                 class="w-full h-full object-cover">
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
+
                         </div>
                     @else
+                        {{-- Placeholder khi không có ảnh nào --}}
                         <div class="w-full h-[350px] md:h-[420px] bg-[#f5f0ec] rounded-xl flex items-center justify-center">
                             <svg class="w-16 h-16 text-[#c9a9a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>

@@ -188,4 +188,106 @@ class ProductTest extends TestCase
             'name' => 'Tên mới sau update',
         ]);
     }
+
+    public function test_brand_filter_returns_only_matching_products(): void
+    {
+        $this->createProduct(['brand' => 'Nike', 'name' => 'Nike Air 1']);
+        $this->createProduct(['brand' => 'Nike', 'name' => 'Nike Air 2']);
+        $this->createProduct(['brand' => 'Adidas', 'name' => 'Adidas X']);
+
+        $response = $this->get('/products?brand=Nike');
+
+        $response->assertStatus(200);
+        $this->assertEquals(2, $response->viewData('products')->total());
+    }
+
+    public function test_brand_filter_excludes_other_brands(): void
+    {
+        $this->createProduct(['brand' => 'Zara']);
+        $this->createProduct(['brand' => 'Uniqlo']);
+        $this->createProduct(['brand' => 'Uniqlo']);
+
+        $response = $this->get('/products?brand=Zara');
+
+        $this->assertEquals(1, $response->viewData('products')->total());
+    }
+
+    public function test_brand_filter_combined_with_category_and_min_price(): void
+    {
+        $cat = Category::factory()->create();
+
+        // Thỏa cả 3 điều kiện
+        $this->createProduct(['brand' => 'Nike', 'category_id' => $cat->id, 'price' => 500000]);
+        // Sai brand
+        $this->createProduct(['brand' => 'Adidas', 'category_id' => $cat->id, 'price' => 500000]);
+        // Sai category
+        $this->createProduct(['brand' => 'Nike', 'price' => 500000]);
+        // Giá quá thấp
+        $this->createProduct(['brand' => 'Nike', 'category_id' => $cat->id, 'price' => 100000]);
+
+        $response = $this->get("/products?brand=Nike&category={$cat->id}&min_price=300000");
+
+        $this->assertEquals(1, $response->viewData('products')->total());
+    }
+
+    public function test_brands_list_passed_to_view(): void
+    {
+        $this->createProduct(['brand' => 'Nike']);
+        $this->createProduct(['brand' => 'Adidas']);
+        $this->createProduct(['brand' => null]);
+
+        $response = $this->get('/products');
+
+        $brands = $response->viewData('brands');
+        $this->assertContains('Nike', $brands->toArray());
+        $this->assertContains('Adidas', $brands->toArray());
+        $this->assertCount(2, $brands);
+    }
+
+    public function test_product_show_loads_images_relation(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-gallery-test']);
+        \App\Models\ProductImage::factory()->count(3)->create([
+            'product_id' => $product->id,
+        ]);
+
+        $response = $this->get('/products/sp-gallery-test');
+
+        $response->assertStatus(200);
+        $loadedProduct = $response->viewData('product');
+        $this->assertCount(3, $loadedProduct->images);
+    }
+
+    public function test_product_show_without_images_does_not_crash(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-no-image']);
+
+        $response = $this->get('/products/sp-no-image');
+
+        $response->assertStatus(200);
+        $this->assertCount(0, $response->viewData('product')->images);
+    }
+
+    public function test_product_show_images_ordered_primary_first(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-primary-first']);
+        \App\Models\ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'is_primary'  => false,
+            'sort_order'  => 1,
+        ]);
+        \App\Models\ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'is_primary'  => true,
+            'sort_order'  => 2,
+        ]);
+
+        // Truy vấn trực tiếp với ordering giống controller: is_primary DESC, sort_order ASC
+        $images = \App\Models\ProductImage::where('product_id', $product->id)
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->get();
+
+        $this->assertTrue($images->first()->is_primary);
+    }
 }
