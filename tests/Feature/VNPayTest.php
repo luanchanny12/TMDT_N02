@@ -158,7 +158,7 @@ class VNPayTest extends TestCase
         $this->assertSame('01', $result['RspCode']);
     }
 
-    public function test_return_url_with_valid_success_signature_updates_payment(): void
+    public function test_return_url_with_valid_success_signature_redirects_to_order_success(): void
     {
         [$payment, $order] = $this->makePaidFlowPayment(300000);
 
@@ -171,7 +171,7 @@ class VNPayTest extends TestCase
 
         $response = $this->get(route('payment.vnpay.return', $data));
 
-        $response->assertOk()->assertSee('Giao dịch thành công');
+        $response->assertRedirect(route('orders.success', $order->id));
         $this->assertSame('paid', $payment->fresh()->status);
         $this->assertSame('paid', $order->fresh()->payment_status);
     }
