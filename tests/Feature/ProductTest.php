@@ -82,4 +82,110 @@ class ProductTest extends TestCase
         $this->createProduct();
         $this->get('/')->assertStatus(200)->assertViewIs('pages.home');
     }
+
+    public function test_category_page_loads_with_parent_and_children_products(): void
+    {
+        $parent = Category::factory()->create([
+            'name'      => 'Danh mục cha page test',
+            'slug'      => 'danh-muc-cha-page-test',
+            'parent_id' => null,
+            'status'    => 'active',
+        ]);
+        $child1 = Category::factory()->child($parent->id)->create([
+            'slug'   => 'con-mot-page-test',
+            'status' => 'active',
+        ]);
+        $child2 = Category::factory()->child($parent->id)->create([
+            'slug'   => 'con-hai-page-test',
+            'status' => 'active',
+        ]);
+        $inactiveChild = Category::factory()->child($parent->id)->inactive()->create([
+            'slug'   => 'con-an-page-test',
+            'status' => 'inactive',
+        ]);
+
+        Product::factory()->create(['category_id' => $child1->id, 'status' => 'active']);
+        Product::factory()->create(['category_id' => $child2->id, 'status' => 'active']);
+        Product::factory()->create(['category_id' => $inactiveChild->id, 'status' => 'active']);
+
+        $response = $this->get('/danh-muc/danh-muc-cha-page-test');
+
+        $response->assertOk()
+            ->assertViewIs('categories.show')
+            ->assertSee('Danh mục cha page test');
+
+        $this->assertEquals(2, $response->viewData('products')->total());
+    }
+
+    public function test_category_page_for_child_shows_only_child_products(): void
+    {
+        $parent = Category::factory()->create(['parent_id' => null, 'status' => 'active']);
+        $child1 = Category::factory()->child($parent->id)->create([
+            'slug'   => 'chi-con-mot',
+            'status' => 'active',
+        ]);
+        Category::factory()->child($parent->id)->create([
+            'slug'   => 'chi-con-hai',
+            'status' => 'active',
+        ]);
+
+        Product::factory()->create(['category_id' => $child1->id, 'status' => 'active']);
+        Product::factory()->create(['category_id' => $child1->id, 'status' => 'inactive']);
+
+        $response = $this->get('/danh-muc/chi-con-mot');
+
+        $response->assertOk();
+        $this->assertEquals(1, $response->viewData('products')->total());
+    }
+
+    public function test_category_page_unknown_slug_returns_404(): void
+    {
+        $this->get('/danh-muc/slug-khong-ton-tai')->assertNotFound();
+    }
+
+    public function test_category_page_inactive_category_returns_404(): void
+    {
+        Category::factory()->create([
+            'slug'      => 'danh-muc-an',
+            'parent_id' => null,
+            'status'    => 'inactive',
+        ]);
+
+        $this->get('/danh-muc/danh-muc-an')->assertNotFound();
+    }
+
+    public function test_category_route_uses_slug(): void
+    {
+        $category = Category::factory()->create([
+            'slug'      => 'duong-dan-slug',
+            'parent_id' => null,
+            'status'    => 'active',
+        ]);
+
+        $this->assertSame(
+            url('/danh-muc/duong-dan-slug'),
+            route('categories.show', $category)
+        );
+    }
+
+    public function test_admin_can_update_category_by_id(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::factory()->create([
+            'name'      => 'Tên cũ',
+            'slug'      => 'ten-cu',
+            'parent_id' => null,
+        ]);
+
+        $response = $this->actingAs($admin)->put(
+            route('admin.categories.update', ['category' => $category->id]),
+            ['name' => 'Tên mới sau update']
+        );
+
+        $response->assertRedirect(route('admin.categories.index'));
+        $this->assertDatabaseHas('categories', [
+            'id'   => $category->id,
+            'name' => 'Tên mới sau update',
+        ]);
+    }
 }

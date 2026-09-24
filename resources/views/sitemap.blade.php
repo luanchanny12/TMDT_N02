@@ -19,7 +19,7 @@
     {{-- Danh mục --}}
     @foreach($categories as $category)
     <url>
-        <loc>{{ url('/products?category=' . $category->slug) }}</loc>
+        <loc>{{ route('categories.show', $category) }}</loc>
         <lastmod>{{ $category->updated_at->format('Y-m-d') }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
