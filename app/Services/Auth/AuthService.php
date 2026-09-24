@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Services\AuditService;
 use App\Services\BaseService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -21,10 +22,10 @@ class AuthService extends BaseService
     public function register(array $data): User
     {
         $user = User::create([
-            'name'          => $data['name'],
-            'email'         => $data['email'],
-            'password'      => Hash::make($data['password']),
-            'role'          => 'customer',
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => 'customer',
             'referral_code' => $this->generateUniqueReferralCode(),
         ]);
 
@@ -35,21 +36,38 @@ class AuthService extends BaseService
 
     /**
      * Đăng nhập bằng email + password.
-     * Trả về true nếu thành công.
+     * Trả về true nếu thành công. Ghi vết login_success / login_failed.
      */
     public function login(array $credentials, bool $remember = false): bool
     {
-        return Auth::attempt([
-            'email'    => $credentials['email'],
+        $success = Auth::attempt([
+            'email' => $credentials['email'],
             'password' => $credentials['password'],
         ], $remember);
+
+        if ($success) {
+            AuditService::log('login_success', 'User', Auth::id());
+        } else {
+            $userId = User::where('email', $credentials['email'])->value('id');
+            AuditService::log(
+                'login_failed',
+                'User',
+                $userId ? (int) $userId : null,
+                ['email' => $credentials['email']],
+                $userId ? (int) $userId : null
+            );
+        }
+
+        return $success;
     }
 
     /**
-     * Đăng xuất user hiện tại.
+     * Đăng xuất user hiện tại. Ghi vết logout.
      */
     public function logout(): void
     {
+        AuditService::log('logout', 'User', auth()->id());
+
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
@@ -71,10 +89,10 @@ class AuthService extends BaseService
     {
         return Password::reset(
             [
-                'email'                 => $data['email'],
-                'password'              => $data['password'],
+                'email' => $data['email'],
+                'password' => $data['password'],
                 'password_confirmation' => $data['password_confirmation'],
-                'token'                 => $data['token'],
+                'token' => $data['token'],
             ],
             function (User $user, string $password) {
                 $user->forceFill(['password' => Hash::make($password)])->save();
@@ -97,11 +115,11 @@ class AuthService extends BaseService
         $user = User::updateOrCreate(
             ['provider_id' => $googleUser->getId(), 'provider' => 'google'],
             [
-                'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
-                'avatar'            => $googleUser->getAvatar(),
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'avatar' => $googleUser->getAvatar(),
                 'email_verified_at' => now(),
-                'referral_code'     => $referralCode,
+                'referral_code' => $referralCode,
             ]
         );
 

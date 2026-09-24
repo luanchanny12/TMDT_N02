@@ -2,7 +2,11 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Sao lưu DB hằng ngày lúc 02:00 (cần `php artisan schedule:work` hoặc Task Scheduler)
+Schedule::command('db:backup')->dailyAt('02:00');

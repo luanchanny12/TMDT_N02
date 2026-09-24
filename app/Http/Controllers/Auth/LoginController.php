@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\AuditLog;
-use App\Models\User;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -52,8 +50,6 @@ class LoginController extends Controller
         );
 
         if (! $success) {
-            $this->logLoginFailed($request);
-
             return back()
                 ->withInput($request->only('email'))
                 ->withErrors(['email' => 'Email hoặc mật khẩu không chính xác.']);
@@ -67,21 +63,5 @@ class LoginController extends Controller
         }
 
         return redirect()->intended(route('home'));
-    }
-
-    private function logLoginFailed(LoginRequest $request): void
-    {
-        $email = (string) $request->input('email');
-        $userId = User::where('email', $email)->value('id');
-
-        AuditLog::create([
-            'user_id' => $userId,
-            'action' => 'login_failed',
-            'entity_type' => 'User',
-            'entity_id' => $userId,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => ['email' => $email],
-        ]);
     }
 }

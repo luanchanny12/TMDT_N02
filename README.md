@@ -21,6 +21,22 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Cấu hình HTTPS (production)
+
+KHÔNG bật force-HTTPS trên local (`http://tmdt-n02.local`). Khi deploy HTTPS thật:
+
+1. Certificate: Let's Encrypt / Caddy / reverse proxy (Nginx).
+2. `.env`: `APP_URL=https://your-domain`, bật `SESSION_SECURE_COOKIE=true`.
+3. Nếu cần ép scheme trong app (`AppServiceProvider::boot`):
+   ```php
+   // CHỈ khi production HTTPS
+   // URL::forceScheme('https');
+   ```
+4. Deploy: `php artisan config:cache && php artisan route:cache`.
+5. Backup DB: `php artisan db:backup` (schedule 02:00 — cần `php artisan schedule:work`).
+6. Restore: `mysql -u root social_commerce < storage/app/backups/database_xxx.sql`.
+7. CSP: chưa bật strict trên local (Livewire/Alpine inline scripts); production bật với nonce.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

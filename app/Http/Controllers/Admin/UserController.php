@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -90,6 +91,12 @@ class UserController extends Controller
         }
 
         $user->update(['is_active' => ! $user->is_active]);
+
+        AuditService::log(
+            $user->is_active ? 'user_unblocked' : 'user_blocked',
+            'User',
+            $user->id
+        );
 
         if ($request->wantsJson()) {
             return response()->json([
