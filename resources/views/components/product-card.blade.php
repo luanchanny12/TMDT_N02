@@ -14,7 +14,7 @@
 @endphp
 
 <div class="flex flex-col h-full group bg-white rounded-xl shadow-sm border border-[#efe8e3] overflow-hidden hover-lift relative animate-fade-in-up"
-     x-data="{ cartLoading: false, wishlistLoading: false, wishlisted: {{ $isWishlisted ? 'true' : 'false' }} }">
+     x-data="{ cartLoading: false, wishlistLoading: false, compareLoading: false, wishlisted: {{ $isWishlisted ? 'true' : 'false' }} }">
 
     {{-- Discount Badge --}}
     @if($discountPercent > 0)
@@ -34,9 +34,50 @@
             </div>
         @endif
 
+        {{-- Compare Button --}}
+        <button type="button"
+                title="So sánh"
+                @click="
+                    compareLoading = true;
+                    fetch('{{ route('compare.add', $product) }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                    .then(({ ok, data }) => {
+                        compareLoading = false;
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: {
+                                message: data.message || (ok ? 'Đã thêm vào danh sách so sánh!' : 'Không thể thêm vào so sánh.'),
+                                type: ok ? 'success' : 'error'
+                            }
+                        }));
+                    })
+                    .catch(() => {
+                        compareLoading = false;
+                        window.dispatchEvent(new CustomEvent('toast', {
+                            detail: { message: 'Có lỗi xảy ra, thử lại sau.', type: 'error' }
+                        }));
+                    })
+                "
+                :disabled="compareLoading"
+                class="absolute bottom-3 left-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white transition-all disabled:opacity-60">
+            <svg x-show="!compareLoading" class="w-5 h-5 text-[#9a9490]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            <svg x-show="compareLoading" x-cloak class="w-5 h-5 animate-spin text-[#9a9490]" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </button>
+
         {{-- Wishlist Heart Button --}}
         @auth
             <button type="button"
+                    title="Yêu thích"
                     @click="
                         wishlistLoading = true;
                         fetch('{{ route('wishlist.toggle', $product) }}', {
