@@ -203,5 +203,8 @@ class VNPayTest extends TestCase
         $this->assertStringContainsString('vnp_SecureHash=', $url);
         $this->assertStringContainsString('vnp_TxnRef=VNP-URL-TEST', $url);
         $this->assertStringContainsString('vnp_TmnCode=', $url);
+
+        // Không gửi vnp_BankCode → VNPay hiện màn hình chọn ngân hàng
+        $this->assertStringNotContainsString('vnp_BankCode=', $url);
     }
 }
