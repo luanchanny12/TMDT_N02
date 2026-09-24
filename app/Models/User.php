@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Product;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -19,9 +17,12 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'phone',
+        'address',
         'provider',
         'provider_id',
         'role',
+        'is_active',
         'referral_code',
     ];
 
@@ -38,7 +39,7 @@ class User extends Authenticatable
         ];
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
+    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     public function isAdmin(): bool
     {
@@ -47,44 +48,25 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────────────────────────────────────
 
-    public function cart(): HasOne
-    {
-        return $this->hasOne(Cart::class);
-    }
-
-    public function orders(): HasMany
+    public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function wishlist(): HasOne
+    public function wishlist()
     {
         return $this->hasOne(Wishlist::class);
     }
 
-    public function couponUsages(): HasMany
+    public function wishlistedProducts()
     {
-        return $this->hasMany(CouponUsage::class);
+        return Product::whereHas('wishlistedBy', function ($q) {
+            $q->where('users.id', $this->id);
+        });
     }
 
-    /**
-     * Các lần user này giới thiệu người khác (user là referrer).
-     */
-    public function referrals(): HasMany
+    public function reviews()
     {
-        return $this->hasMany(Referral::class, 'referrer_id');
-    }
-
-    /**
-     * User này được giới thiệu bởi ai (user là referred_user).
-     */
-    public function referredBy(): HasOne
-    {
-        return $this->hasOne(Referral::class, 'referred_user_id');
+        return $this->hasMany(Review::class);
     }
 }

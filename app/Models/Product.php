@@ -4,33 +4,77 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
-        'name',
-        'slug',
-        'sku',
-        'description',
-        'price',
-        'sale_price',
-        'stock',
-        'brand',
-        'status',
+        'name', 'slug', 'sku', 'description', 'price', 'sale_price',
+        'stock', 'views_count', 'brand', 'status', 'category_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'price'      => 'integer',
+            'price' => 'integer',
             'sale_price' => 'integer',
-            'stock'      => 'integer',
+            'stock' => 'integer',
+            'views_count' => 'integer',
         ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    // ─── Relationships ────────────────────────────────────────────────────────
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(ProductImage::class)
+            ->where('is_primary', true)
+            ->orWhere(function ($q) {
+                $q->where('is_primary', false)->orderBy('sort_order')->limit(1);
+            });
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function wishlistedBy()
+    {
+        return User::whereHas('wishlist.items', function ($q) {
+            $q->where('product_id', $this->id);
+        });
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->with('user')->latest();
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function hasVariants(): bool
+    {
+        return $this->variants()->exists();
     }
 
     // ─── Scopes ───────────────────────────────────────────────────────────────
@@ -45,11 +89,8 @@ class Product extends Model
         return $query->where('stock', '>', 0);
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
+    // ─── Accessors / Helpers ──────────────────────────────────────────────────
 
-    /**
-     * Trả về sale_price nếu có, ngược lại trả price.
-     */
     public function effectivePrice(): int
     {
         return $this->sale_price ?? $this->price;
@@ -60,35 +101,20 @@ class Product extends Model
         return $this->sale_price !== null && $this->sale_price < $this->price;
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function category(): BelongsTo
+    public function getImageUrlAttribute(): ?string
     {
-        return $this->belongsTo(Category::class);
+        $img = $this->images()->where('is_primary', true)->first() ?? $this->images()->first();
+
+        return $img?->url;
     }
 
-    public function images(): HasMany
+    public function getAverageRatingAttribute(): float
     {
-        return $this->hasMany(ProductImage::class);
+        return round($this->reviews()->where('status', 'approved')->avg('rating') ?? 0, 1);
     }
 
-    public function cartItems(): HasMany
+    public function getReviewsCountAttribute(): int
     {
-        return $this->hasMany(CartItem::class);
-    }
-
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function wishlistItems(): HasMany
-    {
-        return $this->hasMany(WishlistItem::class);
+        return $this->reviews()->where('status', 'approved')->count();
     }
 }

@@ -2,38 +2,46 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderItem extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'order_id',
-        'product_id',
-        'product_name',  // snapshot
-        'price',         // snapshot giá tại thời điểm mua
-        'quantity',
-        'subtotal',      // price * quantity
+        'order_id', 'product_id', 'variant_id', 'product_name', 'size', 'color',
+        'price', 'quantity', 'subtotal',
     ];
 
     protected function casts(): array
     {
         return [
-            'price'    => 'integer',
+            'price' => 'integer',
             'quantity' => 'integer',
             'subtotal' => 'integer',
         ];
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────────
-
-    public function order(): BelongsTo
+    public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
+
+    public function optionLabel(): ?string
+    {
+        $label = collect([$this->size, $this->color])->filter()->implode(' - ');
+
+        return $label !== '' ? $label : null;
     }
 }

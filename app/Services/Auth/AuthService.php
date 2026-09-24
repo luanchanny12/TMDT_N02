@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Services\AuditService;
 use App\Services\BaseService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -21,10 +22,10 @@ class AuthService extends BaseService
     public function register(array $data): User
     {
         $user = User::create([
-            'name'          => $data['name'],
-            'email'         => $data['email'],
-            'password'      => Hash::make($data['password']),
-            'role'          => 'customer',
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => 'customer',
             'referral_code' => $this->generateUniqueReferralCode(),
         ]);
 
@@ -35,21 +36,53 @@ class AuthService extends BaseService
 
     /**
      * Đăng nhập bằng email + password.
-     * Trả về true nếu thành công.
+     * Trả về true nếu thành công. Ghi vết login_success / login_failed.
      */
     public function login(array $credentials, bool $remember = false): bool
     {
-        return Auth::attempt([
-            'email'    => $credentials['email'],
+        $success = Auth::attempt([
+            'email' => $credentials['email'],
             'password' => $credentials['password'],
+            'is_active' => true,
         ], $remember);
+
+        if ($success) {
+            AuditService::log('login_success', 'User', Auth::id());
+        } else {
+            $userId = User::where('email', $credentials['email'])->value('id');
+            $user = $userId ? User::find($userId) : null;
+            $blocked = $user
+                && ! $user->is_active
+                && Hash::check($credentials['password'], $user->password);
+
+            AuditService::log(
+                $blocked ? 'login_blocked' : 'login_failed',
+                'User',
+                $userId ? (int) $userId : null,
+                ['email' => $credentials['email']],
+                $userId ? (int) $userId : null
+            );
+        }
+
+        return $success;
+    }
+
+    public function isBlockedLogin(string $email, string $password): bool
+    {
+        $user = User::where('email', $email)->first();
+
+        return $user
+            && ! $user->is_active
+            && Hash::check($password, $user->password);
     }
 
     /**
-     * Đăng xuất user hiện tại.
+     * Đăng xuất user hiện tại. Ghi vết logout.
      */
     public function logout(): void
     {
+        AuditService::log('logout', 'User', auth()->id());
+
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
@@ -71,10 +104,10 @@ class AuthService extends BaseService
     {
         return Password::reset(
             [
-                'email'                 => $data['email'],
-                'password'              => $data['password'],
+                'email' => $data['email'],
+                'password' => $data['password'],
                 'password_confirmation' => $data['password_confirmation'],
-                'token'                 => $data['token'],
+                'token' => $data['token'],
             ],
             function (User $user, string $password) {
                 $user->forceFill(['password' => Hash::make($password)])->save();
@@ -90,17 +123,18 @@ class AuthService extends BaseService
     {
         $googleUser = Socialite::driver('google')->user();
 
+        // Calculate referral code before updateOrCreate because Eloquent doesn't evaluate Closures here
+        $existingUser = User::where('email', $googleUser->getEmail())->first();
+        $referralCode = $existingUser ? $existingUser->referral_code : $this->generateUniqueReferralCode();
+
         $user = User::updateOrCreate(
             ['provider_id' => $googleUser->getId(), 'provider' => 'google'],
             [
-                'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
-                'avatar'            => $googleUser->getAvatar(),
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'avatar' => $googleUser->getAvatar(),
                 'email_verified_at' => now(),
-                'referral_code'     => fn ($attr) =>
-                    User::where('email', $googleUser->getEmail())->exists()
-                        ? User::where('email', $googleUser->getEmail())->value('referral_code')
-                        : $this->generateUniqueReferralCode(),
+                'referral_code' => $referralCode,
             ]
         );
 
