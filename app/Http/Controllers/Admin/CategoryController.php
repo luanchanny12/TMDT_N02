@@ -12,6 +12,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::withCount('products')
+            ->with('parent')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -22,10 +23,15 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'image'      => 'nullable|image|max:1024',
+            'name' => 'required|string|max:255',
+            'image' => 'nullable|image|max:1024',
             'sort_order' => 'nullable|integer|min:0',
+            'parent_id' => 'nullable|integer|exists:categories,id',
         ]);
+
+        if (($error = $this->validateParent(null, $validated['parent_id'] ?? null)) !== null) {
+            return back()->withErrors(['parent_id' => $error])->withInput();
+        }
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -44,10 +50,21 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'image'      => 'nullable|image|max:1024',
+            'name' => 'required|string|max:255',
+            'image' => 'nullable|image|max:1024',
             'sort_order' => 'nullable|integer|min:0',
+            'parent_id' => 'nullable|integer|exists:categories,id',
         ]);
+
+        $parentId = $validated['parent_id'] ?? null;
+
+        if ($parentId !== null && (int) $parentId === (int) $category->id) {
+            return back()->withErrors(['parent_id' => 'Không thể tự chọn chính danh mục này làm cha.'])->withInput();
+        }
+
+        if (($error = $this->validateParent($category->id, $parentId)) !== null) {
+            return back()->withErrors(['parent_id' => $error])->withInput();
+        }
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -61,6 +78,25 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Cập nhật danh mục thành công!');
+    }
+
+    private function validateParent(?int $categoryId, $parentId): ?string
+    {
+        if ($parentId === null) {
+            return null;
+        }
+
+        if ($categoryId !== null && (int) $parentId === $categoryId) {
+            return 'Không thể tự chọn chính danh mục này làm cha.';
+        }
+
+        $parent = Category::find($parentId);
+
+        if ($parent && $parent->parent_id !== null) {
+            return 'Chỉ được chọn danh mục cấp 1 làm cha (tối đa 2 cấp).';
+        }
+
+        return null;
     }
 
     public function destroy(Category $category)
