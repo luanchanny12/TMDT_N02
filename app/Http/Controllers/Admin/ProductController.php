@@ -57,7 +57,11 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
+            $uploadDir = public_path('images/products');
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $file->move($uploadDir, $filename);
 
             ProductImage::create([
                 'product_id' => $product->id,
@@ -135,5 +139,62 @@ class ProductController extends Controller
         }
 
         return back()->with('success', 'Cập nhật trạng thái thành công!');
+    }
+
+    public function addImages(Request $request, Product $product)
+    {
+        $request->validate([
+            'images'   => 'required|array|min:1',
+            'images.*' => 'image|max:2048',
+        ]);
+
+        $hasPrimary = $product->images()->where('is_primary', true)->exists();
+        $sortBase   = $product->images()->max('sort_order') ?? -1;
+        $uploadDir  = public_path('images/products');
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        foreach ($request->file('images') as $i => $file) {
+            $filename = time() . '_' . $i . '_' . $file->getClientOriginalName();
+            $file->move($uploadDir, $filename);
+
+            $isPrimary = !$hasPrimary && $i === 0;
+
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => 'images/products/' . $filename,
+                'is_primary'  => $isPrimary,
+                'sort_order'  => $sortBase + $i + 1,
+            ]);
+
+            $hasPrimary = $hasPrimary || $isPrimary;
+        }
+
+        return back()->with('success', 'Đã thêm ' . count($request->file('images')) . ' ảnh!');
+    }
+
+    public function deleteImage(Product $product, ProductImage $image)
+    {
+        if ($image->product_id !== $product->id) {
+            abort(403);
+        }
+
+        $wasPrimary = $image->is_primary;
+
+        // Xoá file vật lý nếu có
+        $fullPath = public_path($image->image_path);
+        if (file_exists($fullPath)) {
+            @unlink($fullPath);
+        }
+
+        $image->delete();
+
+        // Nếu ảnh vừa xoá là ảnh chính → tự động chọn ảnh đầu tiên còn lại làm primary
+        if ($wasPrimary) {
+            $product->images()->orderBy('sort_order')->first()?->update(['is_primary' => true]);
+        }
+
+        return back()->with('success', 'Đã xoá ảnh!');
     }
 }

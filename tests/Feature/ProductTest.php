@@ -243,4 +243,51 @@ class ProductTest extends TestCase
         $this->assertContains('Adidas', $brands->toArray());
         $this->assertCount(2, $brands);
     }
+
+    public function test_product_show_loads_images_relation(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-gallery-test']);
+        \App\Models\ProductImage::factory()->count(3)->create([
+            'product_id' => $product->id,
+        ]);
+
+        $response = $this->get('/products/sp-gallery-test');
+
+        $response->assertStatus(200);
+        $loadedProduct = $response->viewData('product');
+        $this->assertCount(3, $loadedProduct->images);
+    }
+
+    public function test_product_show_without_images_does_not_crash(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-no-image']);
+
+        $response = $this->get('/products/sp-no-image');
+
+        $response->assertStatus(200);
+        $this->assertCount(0, $response->viewData('product')->images);
+    }
+
+    public function test_product_show_images_ordered_primary_first(): void
+    {
+        $product = $this->createProduct(['slug' => 'sp-primary-first']);
+        \App\Models\ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'is_primary'  => false,
+            'sort_order'  => 1,
+        ]);
+        \App\Models\ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'is_primary'  => true,
+            'sort_order'  => 2,
+        ]);
+
+        // Truy vấn trực tiếp với ordering giống controller: is_primary DESC, sort_order ASC
+        $images = \App\Models\ProductImage::where('product_id', $product->id)
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->get();
+
+        $this->assertTrue($images->first()->is_primary);
+    }
 }

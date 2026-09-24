@@ -127,7 +127,10 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $product->load('category', 'images');
+        $product->load([
+            'category',
+            'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order'),
+        ]);
         $relatedProducts = Product::with('category')
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)

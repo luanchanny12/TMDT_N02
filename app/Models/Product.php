@@ -93,8 +93,7 @@ class Product extends Model
     public function getImageUrlAttribute(): ?string
     {
         $img = $this->images()->where('is_primary', true)->first() ?? $this->images()->first();
-
-        return $img ? asset($img->image_path) : null;
+        return $img?->url;
     }
 
     public function getAverageRatingAttribute(): float
