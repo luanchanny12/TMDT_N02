@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Thanh toán</h1>
 
-        <form action="{{ route('checkout.store') }}" method="POST" x-data="checkoutForm()">
+        <form action="{{ route('checkout.review') }}" method="POST" x-data="checkoutForm()">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -155,8 +155,14 @@
 
                         <button type="submit"
                                 class="w-full bg-[#b8847e] text-white py-3 rounded-lg font-semibold hover:bg-[#a6736d] transition mt-6">
-                            Đặt hàng
+                            Xác nhận đơn hàng
                         </button>
+                        <p class="text-xs text-gray-500 mt-3 text-center">
+                            Bằng cách tiếp tục, bạn đồng ý với
+                            <a href="{{ route('pages.privacy') }}" class="underline hover:text-[#b8847e]">Điều kiện giao dịch chung</a>
+                            và
+                            <a href="{{ route('pages.privacy') }}" class="underline hover:text-[#b8847e]">Chính sách bảo mật</a>.
+                        </p>
                     </div>
                 </div>
             </div>
