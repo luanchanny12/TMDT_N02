@@ -46,6 +46,10 @@ class ProductController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
+        if ($request->filled('brand')) {
+            $query->where('brand', $request->brand);
+        }
+
         $sortBy = $request->get('sort', 'latest');
         switch ($sortBy) {
             case 'price_asc':
@@ -63,8 +67,13 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::where('status', 'active')->get();
+        $brands = Product::where('status', 'active')
+            ->whereNotNull('brand')
+            ->distinct()
+            ->orderBy('brand')
+            ->pluck('brand');
 
-        return view('products.index', compact('products', 'categories'));
+        return view('products.index', compact('products', 'categories', 'brands'));
     }
 
     public function category(Request $request, Category $category)

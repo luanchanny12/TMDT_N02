@@ -188,4 +188,59 @@ class ProductTest extends TestCase
             'name' => 'Tên mới sau update',
         ]);
     }
+
+    public function test_brand_filter_returns_only_matching_products(): void
+    {
+        $this->createProduct(['brand' => 'Nike', 'name' => 'Nike Air 1']);
+        $this->createProduct(['brand' => 'Nike', 'name' => 'Nike Air 2']);
+        $this->createProduct(['brand' => 'Adidas', 'name' => 'Adidas X']);
+
+        $response = $this->get('/products?brand=Nike');
+
+        $response->assertStatus(200);
+        $this->assertEquals(2, $response->viewData('products')->total());
+    }
+
+    public function test_brand_filter_excludes_other_brands(): void
+    {
+        $this->createProduct(['brand' => 'Zara']);
+        $this->createProduct(['brand' => 'Uniqlo']);
+        $this->createProduct(['brand' => 'Uniqlo']);
+
+        $response = $this->get('/products?brand=Zara');
+
+        $this->assertEquals(1, $response->viewData('products')->total());
+    }
+
+    public function test_brand_filter_combined_with_category_and_min_price(): void
+    {
+        $cat = Category::factory()->create();
+
+        // Thỏa cả 3 điều kiện
+        $this->createProduct(['brand' => 'Nike', 'category_id' => $cat->id, 'price' => 500000]);
+        // Sai brand
+        $this->createProduct(['brand' => 'Adidas', 'category_id' => $cat->id, 'price' => 500000]);
+        // Sai category
+        $this->createProduct(['brand' => 'Nike', 'price' => 500000]);
+        // Giá quá thấp
+        $this->createProduct(['brand' => 'Nike', 'category_id' => $cat->id, 'price' => 100000]);
+
+        $response = $this->get("/products?brand=Nike&category={$cat->id}&min_price=300000");
+
+        $this->assertEquals(1, $response->viewData('products')->total());
+    }
+
+    public function test_brands_list_passed_to_view(): void
+    {
+        $this->createProduct(['brand' => 'Nike']);
+        $this->createProduct(['brand' => 'Adidas']);
+        $this->createProduct(['brand' => null]);
+
+        $response = $this->get('/products');
+
+        $brands = $response->viewData('brands');
+        $this->assertContains('Nike', $brands->toArray());
+        $this->assertContains('Adidas', $brands->toArray());
+        $this->assertCount(2, $brands);
+    }
 }

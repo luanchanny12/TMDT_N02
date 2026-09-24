@@ -51,6 +51,21 @@
                             </select>
                         </div>
 
+                        {{-- Brand --}}
+                        @if($brands->isNotEmpty())
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Thương hiệu</label>
+                                <select name="brand" class="w-full border border-[#efe8e3] rounded-xl px-3 py-2 text-sm">
+                                    <option value="">Tất cả</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand }}" {{ request('brand') === $brand ? 'selected' : '' }}>
+                                            {{ $brand }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         <button type="submit" class="w-full bg-[#b8847e] text-white py-2 rounded-xl hover:bg-[#a6736d] transition">
                             Áp dụng
                         </button>
