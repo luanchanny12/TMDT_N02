@@ -58,7 +58,7 @@ Route::get('/payment/vnpay/ipn', [PaymentController::class, 'vnpayIpn'])->name('
 // Auth: Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
 
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
