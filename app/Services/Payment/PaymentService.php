@@ -4,6 +4,7 @@ namespace App\Services\Payment;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\AuditService;
 use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,7 +40,7 @@ class PaymentService extends BaseService
 
     private function createVNPayPayment(Order $order, string $ipAddress): Payment
     {
-        $transactionCode = 'VNP-' . time() . '-' . Str::random(4);
+        $transactionCode = 'VNP-'.time().'-'.Str::random(4);
 
         $payment = Payment::create([
             'order_id' => $order->id,
@@ -50,7 +51,7 @@ class PaymentService extends BaseService
         ]);
 
         $url = $this->vnpayService->buildPaymentUrl($order, $transactionCode, $ipAddress);
-        
+
         // Temporarily store the redirect URL in a non-DB property for the controller to use
         $payment->redirect_url = $url;
 
@@ -60,7 +61,7 @@ class PaymentService extends BaseService
     public function processVNPayIpn(array $inputData): array
     {
         // 1. Verify signature
-        if (!$this->vnpayService->verifyCallback($inputData)) {
+        if (! $this->vnpayService->verifyCallback($inputData)) {
             return ['RspCode' => '97', 'Message' => 'Invalid signature'];
         }
 
@@ -72,8 +73,8 @@ class PaymentService extends BaseService
             // 2. Find Order via Payment
             // Sử dụng lockForUpdate để chống race condition nếu IPN gọi 2 lần cùng lúc
             $payment = Payment::where('transaction_code', $transactionCode)->lockForUpdate()->first();
-            
-            if (!$payment) {
+
+            if (! $payment) {
                 return ['RspCode' => '01', 'Message' => 'Order not found'];
             }
 
@@ -101,6 +102,12 @@ class PaymentService extends BaseService
                 // 7. Update Order
                 $order->update([
                     'payment_status' => 'paid',
+                ]);
+
+                AuditService::log('payment_paid', 'Payment', $payment->id, [
+                    'transaction_code' => $transactionCode,
+                    'amount' => $payment->amount,
+                    'order_id' => $order->id,
                 ]);
 
                 return ['RspCode' => '00', 'Message' => 'Confirm Success'];

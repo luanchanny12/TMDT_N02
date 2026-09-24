@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -32,21 +33,22 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::orderBy('name')->get();
+
         return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'price'         => 'required|numeric|min:0',
-            'sale_price'    => 'nullable|numeric|min:0|lt:price',
-            'category_id'   => 'required|exists:categories,id',
-            'stock'         => 'required|integer|min:0',
-            'brand'         => 'nullable|string',
-            'image'         => 'nullable|image|max:2048',
-            'status'        => 'sometimes|in:active,inactive',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0|lt:price',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'required|integer|min:0',
+            'brand' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+            'status' => 'sometimes|in:active,inactive',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -55,17 +57,11 @@ class ProductController extends Controller
         $product = Product::create(collect($validated)->only(['name', 'slug', 'description', 'price', 'sale_price', 'category_id', 'stock', 'brand', 'status'])->toArray());
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $uploadDir = public_path('images/products');
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $file->move($uploadDir, $filename);
+            $path = $request->file('image')->store('images/products', 'public');
 
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_path' => 'images/products/' . $filename,
+                'image_path' => $path,
                 'is_primary' => true,
                 'sort_order' => 0,
             ]);
@@ -78,21 +74,22 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::orderBy('name')->get();
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'price'         => 'required|numeric|min:0',
-            'sale_price'    => 'nullable|numeric|min:0|lt:price',
-            'category_id'   => 'required|exists:categories,id',
-            'stock'         => 'required|integer|min:0',
-            'brand'         => 'nullable|string',
-            'image'         => 'nullable|image|max:2048',
-            'status'        => 'sometimes|in:active,inactive,out_of_stock',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0|lt:price',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'required|integer|min:0',
+            'brand' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+            'status' => 'sometimes|in:active,inactive,out_of_stock',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -100,18 +97,28 @@ class ProductController extends Controller
         $product->update(collect($validated)->only(['name', 'slug', 'description', 'price', 'sale_price', 'category_id', 'stock', 'brand', 'status'])->toArray());
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
+            $path = $request->file('image')->store('images/products', 'public');
 
-            $product->images()->update(['is_primary' => false]);
+            $oldImages = $product->images()->where('is_primary', true)->get();
+
+            $product->images()->where('is_primary', true)->delete();
 
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_path' => 'images/products/' . $filename,
+                'image_path' => $path,
                 'is_primary' => true,
                 'sort_order' => 0,
             ]);
+
+            foreach ($oldImages as $oldImage) {
+                $stillUsed = ProductImage::where('image_path', $oldImage->image_path)
+                    ->where('id', '!=', $oldImage->id)
+                    ->exists();
+
+                if (! $stillUsed && str_starts_with($oldImage->image_path, 'images/products/')) {
+                    Storage::disk('public')->delete($oldImage->image_path);
+                }
+            }
         }
 
         return redirect()->route('admin.products.index')
@@ -144,34 +151,29 @@ class ProductController extends Controller
     public function addImages(Request $request, Product $product)
     {
         $request->validate([
-            'images'   => 'required|array|min:1',
+            'images' => 'required|array|min:1',
             'images.*' => 'image|max:2048',
         ]);
 
         $hasPrimary = $product->images()->where('is_primary', true)->exists();
-        $sortBase   = $product->images()->max('sort_order') ?? -1;
-        $uploadDir  = public_path('images/products');
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
+        $sortBase = $product->images()->max('sort_order') ?? -1;
 
         foreach ($request->file('images') as $i => $file) {
-            $filename = time() . '_' . $i . '_' . $file->getClientOriginalName();
-            $file->move($uploadDir, $filename);
+            $path = $file->store('images/products', 'public');
 
-            $isPrimary = !$hasPrimary && $i === 0;
+            $isPrimary = ! $hasPrimary && $i === 0;
 
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_path' => 'images/products/' . $filename,
-                'is_primary'  => $isPrimary,
-                'sort_order'  => $sortBase + $i + 1,
+                'image_path' => $path,
+                'is_primary' => $isPrimary,
+                'sort_order' => $sortBase + $i + 1,
             ]);
 
             $hasPrimary = $hasPrimary || $isPrimary;
         }
 
-        return back()->with('success', 'Đã thêm ' . count($request->file('images')) . ' ảnh!');
+        return back()->with('success', 'Đã thêm '.count($request->file('images')).' ảnh!');
     }
 
     public function deleteImage(Product $product, ProductImage $image)
@@ -182,10 +184,12 @@ class ProductController extends Controller
 
         $wasPrimary = $image->is_primary;
 
-        // Xoá file vật lý nếu có
-        $fullPath = public_path($image->image_path);
-        if (file_exists($fullPath)) {
-            @unlink($fullPath);
+        $stillUsed = ProductImage::where('image_path', $image->image_path)
+            ->where('id', '!=', $image->id)
+            ->exists();
+
+        if (! $stillUsed && str_starts_with($image->image_path, 'images/products/')) {
+            Storage::disk('public')->delete($image->image_path);
         }
 
         $image->delete();

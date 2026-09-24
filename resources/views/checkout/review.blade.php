@@ -90,9 +90,9 @@
                                    class="mt-1 h-4 w-4 text-[#b8847e] border-gray-300 rounded focus:ring-[#b8847e]">
                             <span class="text-sm text-gray-700">
                                 Tôi đã đọc và đồng ý với
-                                <a href="{{ route('pages.privacy') }}" class="text-[#b8847e] underline">Điều kiện giao dịch chung</a>
+                                <a href="{{ route('pages.terms') }}" target="_blank" rel="noopener" class="text-[#b8847e] underline">Điều Kiện Giao Dịch Chung</a>
                                 và
-                                <a href="{{ route('pages.privacy') }}" class="text-[#b8847e] underline">Chính sách bảo mật</a>
+                                <a href="{{ route('pages.privacy') }}" target="_blank" rel="noopener" class="text-[#b8847e] underline">Chính sách bảo mật</a>
                                 <span class="text-red-500">*</span>
                             </span>
                         </label>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderStatusChangedMail;
 use App\Models\Order;
+use App\Services\AuditService;
 use App\Services\Referral\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -14,6 +15,7 @@ class OrderController extends Controller
     public function __construct(
         private ReferralService $referralService
     ) {}
+
     public function index(Request $request)
     {
         $query = Order::with('user');
@@ -21,7 +23,7 @@ class OrderController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('order_code', 'like', "%{$search}%")
-                  ->orWhere('shipping_name', 'like', "%{$search}%");
+                    ->orWhere('shipping_name', 'like', "%{$search}%");
             });
         }
 
@@ -50,6 +52,11 @@ class OrderController extends Controller
         $oldStatus = $order->status;
         $order->update(['status' => $validated['status']]);
 
+        AuditService::log('order_status_changed', 'Order', $order->id, [
+            'from' => $oldStatus,
+            'to' => $validated['status'],
+        ]);
+
         if ($validated['status'] === 'delivered') {
             $this->referralService->completeReferral($order);
         } elseif ($validated['status'] === 'cancelled') {
@@ -60,7 +67,7 @@ class OrderController extends Controller
         try {
             Mail::to($order->user->email)->send(new OrderStatusChangedMail($order, $oldStatus));
         } catch (\Exception $e) {
-            \Log::error('Không thể gửi email cập nhật đơn hàng: ' . $e->getMessage());
+            \Log::error('Không thể gửi email cập nhật đơn hàng: '.$e->getMessage());
         }
 
         if ($request->wantsJson()) {

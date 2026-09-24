@@ -8,10 +8,12 @@ use App\Mail\OrderConfirmedMail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\AuditService;
 use App\Services\BaseService;
 use App\Services\Cart\CartService;
 use App\Services\Coupon\CouponService;
 use App\Services\Referral\ReferralService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -45,12 +47,12 @@ class OrderService extends BaseService
             $itemsToCreate = [];
 
             $productIds = $cart->items->pluck('product_id');
-            $products   = Product::whereIn('id', $productIds)->lockForUpdate()->get()->keyBy('id');
+            $products = Product::whereIn('id', $productIds)->lockForUpdate()->get()->keyBy('id');
 
             foreach ($cart->items as $cartItem) {
                 $product = $products->get($cartItem->product_id);
 
-                if (!$product || $product->status !== 'active') {
+                if (! $product || $product->status !== 'active') {
                     throw new OrderException("Sản phẩm \"{$cartItem->product->name}\" hiện không còn kinh doanh.");
                 }
 
@@ -64,23 +66,23 @@ class OrderService extends BaseService
                 $subtotal += $lineTotal;
 
                 $itemsToCreate[] = [
-                    'product_id'   => $product->id,
+                    'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'price'        => $product->effectivePrice(),
-                    'quantity'     => $cartItem->quantity,
-                    'subtotal'     => $lineTotal,
+                    'price' => $product->effectivePrice(),
+                    'quantity' => $cartItem->quantity,
+                    'subtotal' => $lineTotal,
                 ];
             }
 
             // 3. Xử lý Coupon (nếu có trong session)
-            $discount  = 0;
-            $coupon    = null;
+            $discount = 0;
+            $coupon = null;
             $couponCode = session('coupon_code');
 
             if ($couponCode) {
                 try {
                     $result = $this->couponService->validateAndCalculate($couponCode, $subtotal, $user);
-                    $coupon   = $result['coupon'];
+                    $coupon = $result['coupon'];
                     $discount = $result['discount'];
                 } catch (CouponException $e) {
                     session()->forget('coupon_code');
@@ -91,23 +93,23 @@ class OrderService extends BaseService
             // 4. Tính phí ship (freeship khi subtotal >= 500k, không áp dụng cho discount)
             $freeShippingThreshold = 500000;
             $shippingFee = $subtotal >= $freeShippingThreshold ? 0 : 30000;
-            $total       = $subtotal - $discount + $shippingFee;
+            $total = $subtotal - $discount + $shippingFee;
 
             // 5. Tạo Order
             $order = Order::create([
-                'user_id'          => $user->id,
-                'order_code'       => 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
-                'subtotal'         => $subtotal,
-                'discount'         => $discount,
-                'shipping_fee'     => $shippingFee,
-                'total'            => $total,
-                'status'           => 'pending',
-                'payment_method'   => $data['payment_method'],
-                'payment_status'   => 'pending',
-                'shipping_name'    => $data['shipping_name'],
-                'shipping_phone'   => $data['shipping_phone'],
+                'user_id' => $user->id,
+                'order_code' => 'ORD-'.date('Ymd').'-'.strtoupper(Str::random(4)),
+                'subtotal' => $subtotal,
+                'discount' => $discount,
+                'shipping_fee' => $shippingFee,
+                'total' => $total,
+                'status' => 'pending',
+                'payment_method' => $data['payment_method'],
+                'payment_status' => 'pending',
+                'shipping_name' => $data['shipping_name'],
+                'shipping_phone' => $data['shipping_phone'],
                 'shipping_address' => $data['shipping_address'],
-                'note'             => $data['note'] ?? null,
+                'note' => $data['note'] ?? null,
             ]);
 
             // 6. Tạo OrderItems
@@ -130,6 +132,12 @@ class OrderService extends BaseService
             // 10. Lưu vết Referral (nếu có)
             $this->referralService->attachOrderToReferral($order);
 
+            // 10b. Ghi vết giao dịch
+            AuditService::log('order_created', 'Order', $order->id, [
+                'order_code' => $order->order_code,
+                'total' => $order->total,
+            ]);
+
             // 11. Xóa coupon khỏi session
             session()->forget('coupon_code');
 
@@ -137,7 +145,7 @@ class OrderService extends BaseService
             try {
                 Mail::to($user->email)->send(new OrderConfirmedMail($order));
             } catch (\Exception $e) {
-                \Log::error('Không thể gửi email xác nhận đơn hàng: ' . $e->getMessage());
+                \Log::error('Không thể gửi email xác nhận đơn hàng: '.$e->getMessage());
             }
 
             return $order;
@@ -158,7 +166,7 @@ class OrderService extends BaseService
     /**
      * Lấy chi tiết 1 đơn hàng, đảm bảo thuộc về user (tránh IDOR).
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function getOrderForUser(int $orderId, int $userId): Order
     {
@@ -174,6 +182,7 @@ class OrderService extends BaseService
     public function updateStatus(Order $order, string $status): Order
     {
         $order->update(['status' => $status]);
+
         return $order;
     }
 }

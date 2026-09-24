@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -33,12 +34,16 @@ class ReviewController extends Controller
     {
         $review->update(['status' => 'approved']);
 
+        AuditService::log('review_approved', 'Review', $review->id);
+
         return back()->with('success', 'Đã duyệt đánh giá!');
     }
 
     public function reject(Review $review)
     {
         $review->update(['status' => 'rejected']);
+
+        AuditService::log('review_rejected', 'Review', $review->id);
 
         return back()->with('success', 'Đã từ chối đánh giá!');
     }

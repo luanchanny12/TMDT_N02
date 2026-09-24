@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ChatbotFaqController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
@@ -38,6 +39,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/huong-dan-mua-hang', [StaticPageController::class, 'buyingGuide'])->name('pages.buying-guide');
 Route::get('/chinh-sach-doi-tra', [StaticPageController::class, 'returnPolicy'])->name('pages.return-policy');
 Route::get('/chinh-sach-bao-mat', [StaticPageController::class, 'privacy'])->name('pages.privacy');
+Route::get('/dieu-khoan-giao-dich', [StaticPageController::class, 'terms'])->name('pages.terms');
+Route::get('/gioi-thieu', [StaticPageController::class, 'about'])->name('pages.about');
 Route::get('/faq', [StaticPageController::class, 'faq'])->name('pages.faq');
 
 // Products
@@ -141,6 +144,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
     Route::patch('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Audit logs
+    Route::get('/audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');
 
     // Coupons (specific routes before wildcard)
     Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -38,15 +38,17 @@ class SitemapTest extends TestCase
             ->assertSee('huong-dan-mua-hang')
             ->assertSee('chinh-sach-doi-tra')
             ->assertSee('chinh-sach-bao-mat')
+            ->assertSee('dieu-khoan-giao-dich')
+            ->assertSee('gioi-thieu')
             ->assertSee('faq');
     }
 
     public function test_sitemap_contains_category_slug_urls(): void
     {
         Category::factory()->create([
-            'slug'      => 'danh-muc-sitemap-test',
+            'slug' => 'danh-muc-sitemap-test',
             'parent_id' => null,
-            'status'    => 'active',
+            'status' => 'active',
         ]);
 
         $this->get('/sitemap.xml')
