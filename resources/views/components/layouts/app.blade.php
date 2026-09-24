@@ -67,7 +67,7 @@
     </script>
 
     {{-- Header --}}
-    <header class="sticky top-0 z-50 bg-[#faf7f4]/95 backdrop-blur-md border-b border-[#efe8e3]">
+    <header class="sticky top-0 z-[60] bg-[#faf7f4]/95 backdrop-blur-md border-b border-[#efe8e3]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 {{-- Logo --}}
@@ -93,10 +93,101 @@
 
                 {{-- Navigation --}}
                 <nav class="flex items-center space-x-1">
-                    <a href="{{ route('products.index') }}"
-                       class="nav-link px-3 py-2">
-                        Sản phẩm
-                    </a>
+                    {{-- Category menu (desktop hover + mobile accordion) --}}
+                    <div class="relative group"
+                         x-data="{ mobile: false, expanded: null }"
+                         @click.outside="mobile = false">
+                        <button type="button"
+                                class="nav-link px-3 py-2 flex items-center gap-1"
+                                @click="if (window.innerWidth >= 768) { window.location.href = '{{ route('products.index') }}'; } else { mobile = !mobile; }">
+                            Danh mục
+                            <svg class="h-3.5 w-3.5 transition-transform duration-200 md:group-hover:rotate-180"
+                                 :class="mobile ? 'rotate-180' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        {{-- Desktop dropdown --}}
+                        <div class="hidden md:block absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-[60]">
+                            <div class="w-64 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-[#efe8e3] py-2">
+                                @forelse(($navCategories ?? collect()) as $parent)
+                                    <div class="px-4 py-1.5">
+                                        <a href="{{ route('products.index', ['category' => $parent->id]) }}"
+                                           class="block text-sm font-semibold text-[#3d3d3d] hover:text-[#b8847e] transition-colors">
+                                            {{ $parent->name }}
+                                        </a>
+                                        @if($parent->children->isNotEmpty())
+                                            <ul class="mt-1 space-y-0.5 border-l border-[#efe8e3] pl-3">
+                                                @foreach($parent->children as $child)
+                                                    <li>
+                                                        <a href="{{ route('products.index', ['category' => $child->id]) }}"
+                                                           class="block text-sm text-[#5a5550] hover:text-[#b8847e] transition-colors py-0.5">
+                                                            {{ $child->name }}
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <a href="{{ route('products.index') }}"
+                                       class="block px-4 py-2 text-sm text-[#3d3d3d] hover:bg-[#faf7f4] transition-colors">
+                                        Tất cả sản phẩm
+                                    </a>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        {{-- Mobile accordion --}}
+                        <div x-show="mobile" x-cloak
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="md:hidden absolute right-0 top-full mt-1 w-72 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-[#efe8e3] py-2 z-[60]">
+                            @forelse(($navCategories ?? collect()) as $parent)
+                                <div class="border-b border-[#efe8e3] last:border-b-0">
+                                    <div class="flex items-center">
+                                        <a href="{{ route('products.index', ['category' => $parent->id]) }}"
+                                           class="flex-1 px-4 py-2.5 text-sm font-semibold text-[#3d3d3d] hover:text-[#b8847e] transition-colors">
+                                            {{ $parent->name }}
+                                        </a>
+                                        @if($parent->children->isNotEmpty())
+                                            <button type="button"
+                                                    class="px-3 py-2.5 text-[#9a9490] hover:text-[#b8847e]"
+                                                    @click="expanded === {{ $parent->id }} ? expanded = null : expanded = {{ $parent->id }}"
+                                                    :aria-expanded="expanded === {{ $parent->id }}">
+                                                <svg class="h-4 w-4 transition-transform duration-200"
+                                                     :class="expanded === {{ $parent->id }} ? 'rotate-180' : ''"
+                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    @if($parent->children->isNotEmpty())
+                                        <ul x-show="expanded === {{ $parent->id }}" x-cloak
+                                            x-transition:enter="transition ease-out duration-150"
+                                            class="bg-[#faf7f4] border-t border-[#efe8e3]">
+                                            @foreach($parent->children as $child)
+                                                <li>
+                                                    <a href="{{ route('products.index', ['category' => $child->id]) }}"
+                                                       class="block pl-8 pr-4 py-2 text-sm text-[#5a5550] hover:text-[#b8847e] hover:bg-white transition-colors">
+                                                        {{ $child->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </div>
+                            @empty
+                                <a href="{{ route('products.index') }}"
+                                   class="block px-4 py-2 text-sm text-[#3d3d3d] hover:bg-[#faf7f4] transition-colors">
+                                    Tất cả sản phẩm
+                                </a>
+                            @endforelse
+                        </div>
+                    </div>
 
                     {{-- Mobile Search Toggle --}}
                     <div x-data="{ open: false }" class="md:hidden">

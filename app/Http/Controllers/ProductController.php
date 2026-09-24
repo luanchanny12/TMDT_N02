@@ -21,7 +21,21 @@ class ProductController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $category = Category::find($request->category);
+
+            if ($category && $category->parent_id === null) {
+                $categoryIds = Category::query()
+                    ->where('status', 'active')
+                    ->where(function ($q) use ($category) {
+                        $q->where('id', $category->id)
+                          ->orWhere('parent_id', $category->id);
+                    })
+                    ->pluck('id');
+
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $request->category);
+            }
         }
 
         if ($request->filled('min_price')) {
