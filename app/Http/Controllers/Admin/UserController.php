@@ -15,13 +15,69 @@ class UserController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
+        }
+
+        if ($role = $request->input('role')) {
+            $query->where('role', $role);
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('is_active', $status === 'active');
         }
 
         $users = $query->latest()->paginate(15)->withQueryString();
 
         return view('admin.users.index', compact('users'));
+    }
+
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role' => 'required|in:customer,admin',
+            'is_active' => 'required|boolean',
+        ]);
+
+        if ($user->id === $request->user()->id && $validated['role'] !== 'admin') {
+            return back()
+                ->withErrors(['role' => 'Không thể tự hạ quyền của chính mình xuống Customer.'])
+                ->withInput();
+        }
+
+        $user->update($validated);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Cập nhật người dùng thành công!');
+    }
+
+    public function destroy(Request $request, User $user)
+    {
+        if ($user->id === $request->user()->id) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Không thể tự xóa tài khoản của chính mình!');
+        }
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Không thể xóa tài khoản quản trị viên! Hãy khóa tài khoản nếu cần.');
+        }
+
+        if ($user->orders()->exists()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Người dùng đã có đơn hàng. Không thể xóa — hãy khóa tài khoản để giữ lịch sử đơn.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Đã xóa người dùng!');
     }
 
     public function toggleStatus(Request $request, User $user)
@@ -33,7 +89,7 @@ class UserController extends Controller
             ], 403);
         }
 
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
 
         if ($request->wantsJson()) {
             return response()->json([
