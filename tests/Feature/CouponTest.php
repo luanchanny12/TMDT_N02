@@ -20,28 +20,29 @@ class CouponTest extends TestCase
     private function createProduct(array $attrs = []): Product
     {
         $cat = Category::factory()->create();
+
         return Product::factory()->create(array_merge([
             'category_id' => $cat->id,
-            'status'      => 'active',
-            'price'       => 500000,
-            'sale_price'  => null,
-            'stock'       => 20,
+            'status' => 'active',
+            'price' => 500000,
+            'sale_price' => null,
+            'stock' => 20,
         ], $attrs));
     }
 
     private function createCoupon(array $attrs = []): Coupon
     {
         return Coupon::create(array_merge([
-            'code'              => 'TESTCODE',
-            'type'              => 'percent',
-            'value'             => 10,
-            'min_order_amount'  => 200000,
-            'max_discount'      => null,
-            'start_at'          => now()->subDays(5),
-            'end_at'            => now()->addDays(30),
-            'usage_limit'       => 100,
-            'used_count'        => 0,
-            'status'            => 'active',
+            'code' => 'TESTCODE',
+            'type' => 'percent',
+            'value' => 10,
+            'min_order_amount' => 200000,
+            'max_discount' => null,
+            'start_at' => now()->subDays(5),
+            'end_at' => now()->addDays(30),
+            'usage_limit' => 100,
+            'used_count' => 0,
+            'status' => 'active',
         ], $attrs));
     }
 
@@ -49,10 +50,10 @@ class CouponTest extends TestCase
     {
         $cart = Cart::create(['user_id' => $user->id]);
         CartItem::create([
-            'cart_id'    => $cart->id,
+            'cart_id' => $cart->id,
             'product_id' => $product->id,
-            'quantity'   => $quantity,
-            'price'      => $product->price,
+            'quantity' => $quantity,
+            'price' => $product->price,
         ]);
     }
 
@@ -60,9 +61,9 @@ class CouponTest extends TestCase
 
     public function test_valid_coupon_applied_successfully(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct(['price' => 500000]);
-        $coupon  = $this->createCoupon(['type' => 'percent', 'value' => 10, 'min_order_amount' => 200000]);
+        $coupon = $this->createCoupon(['type' => 'percent', 'value' => 10, 'min_order_amount' => 200000]);
 
         $this->setupCartWithProduct($user, $product, 2); // subtotal = 1,000,000
 
@@ -71,9 +72,9 @@ class CouponTest extends TestCase
         ]);
 
         $response->assertOk()->assertJson([
-            'success'  => true,
+            'success' => true,
             'discount' => 100000, // 10% of 1,000,000
-            'code'     => 'TESTCODE',
+            'code' => 'TESTCODE',
         ]);
 
         $this->assertDatabaseHas('coupons', ['code' => 'TESTCODE', 'used_count' => 0]);
@@ -83,7 +84,7 @@ class CouponTest extends TestCase
 
     public function test_invalid_coupon_code_rejected(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct();
         $this->setupCartWithProduct($user, $product);
 
@@ -101,11 +102,11 @@ class CouponTest extends TestCase
 
     public function test_expired_coupon_rejected(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct();
-        $coupon  = $this->createCoupon([
+        $coupon = $this->createCoupon([
             'start_at' => now()->subDays(30),
-            'end_at'   => now()->subDay(),
+            'end_at' => now()->subDay(),
         ]);
 
         $this->setupCartWithProduct($user, $product);
@@ -124,9 +125,9 @@ class CouponTest extends TestCase
 
     public function test_below_min_order_amount_rejected(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct(['price' => 100000]);
-        $coupon  = $this->createCoupon(['min_order_amount' => 500000]);
+        $coupon = $this->createCoupon(['min_order_amount' => 500000]);
 
         $this->setupCartWithProduct($user, $product, 1); // subtotal = 100,000 < 500,000
 
@@ -144,9 +145,9 @@ class CouponTest extends TestCase
 
     public function test_coupon_usage_limit_reached_rejected(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct();
-        $coupon  = $this->createCoupon(['usage_limit' => 5, 'used_count' => 5]);
+        $coupon = $this->createCoupon(['usage_limit' => 5, 'used_count' => 5]);
 
         $this->setupCartWithProduct($user, $product);
 
@@ -164,30 +165,30 @@ class CouponTest extends TestCase
 
     public function test_user_already_used_coupon_rejected(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct();
-        $coupon  = $this->createCoupon();
+        $coupon = $this->createCoupon();
 
         // Tạo order thật và ghi nhận user đã dùng coupon này
         $order = Order::create([
-            'user_id'          => $user->id,
-            'order_code'       => 'ORD-TEST-001',
-            'subtotal'         => 500000,
-            'discount'         => 50000,
-            'shipping_fee'     => 0,
-            'total'            => 450000,
-            'status'           => 'delivered',
-            'payment_method'   => 'cod',
-            'payment_status'   => 'paid',
-            'shipping_name'    => 'Test User',
-            'shipping_phone'   => '0987654321',
+            'user_id' => $user->id,
+            'order_code' => 'ORD-TEST-001',
+            'subtotal' => 500000,
+            'discount' => 50000,
+            'shipping_fee' => 0,
+            'total' => 450000,
+            'status' => 'delivered',
+            'payment_method' => 'cod',
+            'payment_status' => 'paid',
+            'shipping_name' => 'Test User',
+            'shipping_phone' => '0987654321',
             'shipping_address' => '123 Test Street',
         ]);
 
         CouponUsage::create([
             'coupon_id' => $coupon->id,
-            'user_id'   => $user->id,
-            'order_id'  => $order->id,
+            'user_id' => $user->id,
+            'order_id' => $order->id,
         ]);
 
         $this->setupCartWithProduct($user, $product);
@@ -206,9 +207,9 @@ class CouponTest extends TestCase
 
     public function test_coupon_redeemed_on_successful_order(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $product = $this->createProduct(['price' => 500000, 'stock' => 10]);
-        $coupon  = $this->createCoupon(['type' => 'percent', 'value' => 10, 'min_order_amount' => 200000]);
+        $coupon = $this->createCoupon(['type' => 'percent', 'value' => 10, 'min_order_amount' => 200000]);
 
         $this->setupCartWithProduct($user, $product, 2); // subtotal = 1,000,000
 
@@ -216,25 +217,29 @@ class CouponTest extends TestCase
         $response = $this->actingAs($user)->post('/checkout/apply-coupon', ['code' => 'TESTCODE']);
         $response->assertOk();
 
-        // Checkout
-        $response = $this->actingAs($user)->post('/checkout', [
-            'shipping_name'    => 'Test User',
-            'shipping_phone'   => '0987654321',
+        // Checkout 2 bước: review → confirm
+        $this->actingAs($user)->post('/checkout/review', [
+            'shipping_name' => 'Test User',
+            'shipping_phone' => '0987654321',
             'shipping_address' => '123 Test Street',
-            'payment_method'   => 'cod',
+            'payment_method' => 'cod',
+        ])->assertRedirect(route('checkout.review.show'));
+
+        $response = $this->actingAs($user)->post('/checkout/confirm', [
+            'agree_terms' => '1',
         ]);
 
         $response->assertRedirect();
 
         // Verify coupon was redeemed
         $this->assertDatabaseHas('coupons', [
-            'code'       => 'TESTCODE',
+            'code' => 'TESTCODE',
             'used_count' => 1,
         ]);
 
         $this->assertDatabaseHas('coupon_usages', [
             'coupon_id' => $coupon->id,
-            'user_id'   => $user->id,
+            'user_id' => $user->id,
         ]);
 
         // Verify order has discount
@@ -254,7 +259,7 @@ class CouponTest extends TestCase
 
         for ($i = 0; $i < 10; $i++) {
             $threads[] = function () use ($coupon, &$results, $i) {
-                $user    = User::factory()->create();
+                $user = User::factory()->create();
                 $product = $this->createProduct(['price' => 500000]);
                 $this->setupCartWithProduct($user, $product, 1);
 
@@ -262,11 +267,15 @@ class CouponTest extends TestCase
                 $this->app['session']->put('coupon_code', $coupon->code);
 
                 try {
-                    $response = $this->actingAs($user)->post('/checkout', [
-                        'shipping_name'    => "User {$i}",
-                        'shipping_phone'   => '0987654321',
+                    $this->actingAs($user)->post('/checkout/review', [
+                        'shipping_name' => "User {$i}",
+                        'shipping_phone' => '0987654321',
                         'shipping_address' => '123 Test Street',
-                        'payment_method'   => 'cod',
+                        'payment_method' => 'cod',
+                    ]);
+
+                    $response = $this->actingAs($user)->post('/checkout/confirm', [
+                        'agree_terms' => '1',
                     ]);
 
                     $results[] = $response->status();

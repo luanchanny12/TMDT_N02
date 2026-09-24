@@ -86,9 +86,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-    // Checkout
+    // Checkout (2 bước: nhập thông tin → review → confirm)
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
-    Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/review', [OrderController::class, 'review'])->name('checkout.review');
+    Route::get('/checkout/review', [OrderController::class, 'showReview'])->name('checkout.review.show');
+    Route::post('/checkout/confirm', [OrderController::class, 'confirm'])->name('checkout.confirm');
 
     // Coupon
     Route::post('/checkout/apply-coupon', [CouponController::class, 'apply'])->name('checkout.apply-coupon');
