@@ -17,33 +17,88 @@ class OrderTest extends TestCase
     private function createProduct(array $attrs = []): Product
     {
         $cat = Category::factory()->create();
+
         return Product::factory()->create(array_merge([
             'category_id' => $cat->id,
-            'status'      => 'active',
-            'price'       => 100000,
-            'sale_price'  => null,
-            'stock'       => 10,
+            'status' => 'active',
+            'price' => 100000,
+            'sale_price' => null,
+            'stock' => 10,
         ], $attrs));
+    }
+
+    private function fillCart(User $user, Product $product, int $qty, float $price): Cart
+    {
+        $cart = Cart::create(['user_id' => $user->id]);
+        CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'quantity' => $qty,
+            'price' => $price,
+        ]);
+
+        return $cart;
+    }
+
+    private function postReview(User $user, array $overrides = [])
+    {
+        return $this->actingAs($user)->post('/checkout/review', array_merge([
+            'shipping_name' => 'John Doe',
+            'shipping_phone' => '0987654321',
+            'shipping_address' => '123 Test St',
+            'payment_method' => 'cod',
+        ], $overrides));
+    }
+
+    private function postConfirm(User $user, array $overrides = [])
+    {
+        return $this->actingAs($user)->post('/checkout/confirm', array_merge([
+            'agree_terms' => '1',
+        ], $overrides));
     }
 
     public function test_guest_cannot_checkout(): void
     {
-        $this->post('/checkout')->assertRedirect('/login');
+        $this->post('/checkout/review')->assertRedirect('/login');
+        $this->get('/checkout/review')->assertRedirect('/login');
+        $this->post('/checkout/confirm')->assertRedirect('/login');
     }
 
     public function test_cannot_checkout_with_empty_cart(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/checkout', [
-            'shipping_name' => 'John Doe',
-            'shipping_phone' => '0987654321',
-            'shipping_address' => '123 Test St',
-            'payment_method' => 'cod',
-        ]);
+        $response = $this->postReview($user);
 
         $response->assertRedirect();
         $response->assertSessionHas('error', 'Giỏ hàng của bạn đang trống.');
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_checkout_requires_two_steps_and_agree_terms(): void
+    {
+        $user = User::factory()->create();
+        $product = $this->createProduct(['stock' => 5, 'price' => 200000]);
+        $this->fillCart($user, $product, 2, 200000);
+
+        // Confirm without review session → redirected to input
+        $this->actingAs($user)->post('/checkout/confirm', ['agree_terms' => '1'])
+            ->assertRedirect(route('checkout.index'));
+        $this->assertDatabaseCount('orders', 0);
+
+        // Review step saves session
+        $this->postReview($user)->assertRedirect(route('checkout.review.show'));
+
+        // Review page shows
+        $this->actingAs($user)->get('/checkout/review')
+            ->assertOk()
+            ->assertSee('Xác nhận đơn hàng')
+            ->assertSee('John Doe');
+
+        // Confirm without agree_terms → error, no order
+        $this->actingAs($user)->post('/checkout/confirm', [])
+            ->assertRedirect(route('checkout.review.show'))
+            ->assertSessionHas('error', 'Vui lòng đồng ý Điều kiện giao dịch chung');
         $this->assertDatabaseCount('orders', 0);
     }
 
@@ -51,27 +106,14 @@ class OrderTest extends TestCase
     {
         $user = User::factory()->create();
         $product = $this->createProduct(['stock' => 5, 'price' => 200000]);
+        $cart = $this->fillCart($user, $product, 2, 200000);
 
-        // Add to cart manually via DB for testing
-        $cart = Cart::create(['user_id' => $user->id]);
-        CartItem::create([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-            'price' => 200000,
-        ]);
-
-        $response = $this->actingAs($user)->post('/checkout', [
-            'shipping_name' => 'John Doe',
-            'shipping_phone' => '0987654321',
-            'shipping_address' => '123 Test St',
-            'payment_method' => 'cod',
-        ]);
+        $this->postReview($user)->assertRedirect(route('checkout.review.show'));
+        $response = $this->postConfirm($user);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // Check order created
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
             'subtotal' => 400000,
@@ -81,37 +123,27 @@ class OrderTest extends TestCase
             'status' => 'pending',
         ]);
 
-        // Check stock decremented
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'stock' => 3, // 5 - 2
         ]);
 
-        // Check cart cleared
         $this->assertDatabaseMissing('cart_items', [
             'cart_id' => $cart->id,
         ]);
+
+        // checkout session cleared after confirm
+        $this->assertNull(session('checkout'));
     }
 
     public function test_free_shipping_applied_when_subtotal_exceeds_threshold(): void
     {
         $user = User::factory()->create();
         $product = $this->createProduct(['stock' => 5, 'price' => 600000]);
+        $this->fillCart($user, $product, 1, 600000);
 
-        $cart = Cart::create(['user_id' => $user->id]);
-        CartItem::create([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'quantity' => 1,
-            'price' => 600000,
-        ]);
-
-        $this->actingAs($user)->post('/checkout', [
-            'shipping_name' => 'John',
-            'shipping_phone' => '098',
-            'shipping_address' => '123',
-            'payment_method' => 'cod',
-        ]);
+        $this->postReview($user);
+        $this->postConfirm($user);
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
@@ -125,27 +157,15 @@ class OrderTest extends TestCase
     {
         $user = User::factory()->create();
         $product = $this->createProduct(['stock' => 2]); // only 2 in stock
+        $this->fillCart($user, $product, 3, 100000); // ordering 3
 
-        $cart = Cart::create(['user_id' => $user->id]);
-        CartItem::create([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'quantity' => 3, // ordering 3
-            'price' => 100000,
-        ]);
-
-        $response = $this->actingAs($user)->post('/checkout', [
-            'shipping_name' => 'John',
-            'shipping_phone' => '098',
-            'shipping_address' => '123',
-            'payment_method' => 'cod',
-        ]);
+        $this->postReview($user);
+        $response = $this->postConfirm($user);
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
         $this->assertDatabaseCount('orders', 0);
 
-        // Stock shouldn't change
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'stock' => 2,

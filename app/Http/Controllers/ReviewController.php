@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -19,34 +18,42 @@ class ReviewController extends Controller
 
         $hasPurchased = $user->orders()
             ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
-            ->where('status', 'completed')
+            ->whereIn('status', ['delivered', 'completed'])
             ->exists();
 
-        if (!$hasPurchased) {
+        if (! $hasPurchased) {
             return back()->withErrors(['comment' => 'Bạn cần mua và nhận hàng sản phẩm này trước khi đánh giá.']);
         }
 
         $validated = $request->validate([
-            'rating'  => 'required|integer|min:1|max:5',
+            'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:1000',
-            'image'   => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:2048',
         ], [
             'rating.required' => 'Vui lòng chọn số sao.',
-            'rating.min'      => 'Số sao tối thiểu là 1.',
-            'rating.max'      => 'Số sao tối đa là 5.',
-            'image.image'     => 'File phải là hình ảnh.',
-            'image.max'       => 'Hình ảnh tối đa 2MB.',
+            'rating.min' => 'Số sao tối thiểu là 1.',
+            'rating.max' => 'Số sao tối đa là 5.',
+            'image.image' => 'File phải là hình ảnh.',
+            'image.max' => 'Hình ảnh tối đa 2MB.',
         ]);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('reviews', 'public');
         }
 
-        $validated['user_id']    = $user->id;
+        $completedOrder = $user->orders()
+            ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
+            ->whereIn('status', ['delivered', 'completed'])
+            ->latest()
+            ->first();
+
+        $validated['user_id'] = $user->id;
         $validated['product_id'] = $product->id;
+        $validated['order_id'] = $completedOrder->id;
+        $validated['status'] = 'pending';
 
         Review::create($validated);
 
-        return back()->with('success', 'Đánh giá của bạn đã được gửi thành công!');
+        return back()->with('success', 'Đánh giá của bạn đã được gửi thành công và đang chờ duyệt!');
     }
 }

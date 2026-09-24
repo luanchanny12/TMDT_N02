@@ -1,28 +1,32 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\StaticPageController;
-use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\CouponController;
-use App\Http\Controllers\CompareController;
-use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ChatbotFaqController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CompareController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\WishlistController;
+use Illuminate\Support\Facades\Route;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -48,13 +52,13 @@ Route::post('/compare/remove/{product:id}', [CompareController::class, 'remove']
 Route::post('/compare/clear', [CompareController::class, 'clear'])->name('compare.clear');
 
 // Payments (Public Webhook & Return URL)
-Route::get('/payment/vnpay/return', [\App\Http\Controllers\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
-Route::get('/payment/vnpay/ipn', [\App\Http\Controllers\PaymentController::class, 'vnpayIpn'])->name('payment.vnpay.ipn');
+Route::get('/payment/vnpay/return', [PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
+Route::get('/payment/vnpay/ipn', [PaymentController::class, 'vnpayIpn'])->name('payment.vnpay.ipn');
 
 // Auth: Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
 
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
@@ -73,7 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
     // Chat Streaming
-    Route::post('/chat/stream', [\App\Http\Controllers\ChatController::class, 'stream'])->name('chat.stream');
+    Route::post('/chat/stream', [ChatController::class, 'stream'])->name('chat.stream');
 
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -82,9 +86,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-    // Checkout
+    // Checkout (2 bước: nhập thông tin → review → confirm)
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
-    Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+    Route::post('/checkout/review', [OrderController::class, 'review'])->name('checkout.review');
+    Route::get('/checkout/review', [OrderController::class, 'showReview'])->name('checkout.review.show');
+    Route::post('/checkout/confirm', [OrderController::class, 'confirm'])->name('checkout.confirm');
 
     // Coupon
     Route::post('/checkout/apply-coupon', [CouponController::class, 'apply'])->name('checkout.apply-coupon');
@@ -94,8 +100,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/success', [OrderController::class, 'success'])->name('orders.success');
-
-
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -126,6 +130,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+    // Reviews moderation
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::patch('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+    Route::patch('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Coupons (specific routes before wildcard)
     Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
@@ -140,11 +153,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/coupons/{coupon}/usage', [AdminCouponController::class, 'usageHistory'])->name('coupons.usage');
 
     // Chatbot FAQs (specific routes before wildcard)
-    Route::get('/chatbot-faqs', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'index'])->name('chatbot-faqs.index');
-    Route::get('/chatbot-faqs/create', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'create'])->name('chatbot-faqs.create');
-    Route::post('/chatbot-faqs', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'store'])->name('chatbot-faqs.store');
-    Route::get('/chatbot-faqs/{chatbotFaq}/edit', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'edit'])->name('chatbot-faqs.edit');
-    Route::put('/chatbot-faqs/{chatbotFaq}', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'update'])->name('chatbot-faqs.update');
-    Route::delete('/chatbot-faqs/{chatbotFaq}', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'destroy'])->name('chatbot-faqs.destroy');
-    Route::patch('/chatbot-faqs/{chatbotFaq}/toggle', [\App\Http\Controllers\Admin\ChatbotFaqController::class, 'toggleStatus'])->name('chatbot-faqs.toggle');
+    Route::get('/chatbot-faqs', [ChatbotFaqController::class, 'index'])->name('chatbot-faqs.index');
+    Route::get('/chatbot-faqs/create', [ChatbotFaqController::class, 'create'])->name('chatbot-faqs.create');
+    Route::post('/chatbot-faqs', [ChatbotFaqController::class, 'store'])->name('chatbot-faqs.store');
+    Route::get('/chatbot-faqs/{chatbotFaq}/edit', [ChatbotFaqController::class, 'edit'])->name('chatbot-faqs.edit');
+    Route::put('/chatbot-faqs/{chatbotFaq}', [ChatbotFaqController::class, 'update'])->name('chatbot-faqs.update');
+    Route::delete('/chatbot-faqs/{chatbotFaq}', [ChatbotFaqController::class, 'destroy'])->name('chatbot-faqs.destroy');
+    Route::patch('/chatbot-faqs/{chatbotFaq}/toggle', [ChatbotFaqController::class, 'toggleStatus'])->name('chatbot-faqs.toggle');
 });

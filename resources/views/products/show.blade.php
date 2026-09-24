@@ -103,6 +103,48 @@
                         </form>
                     @endif
 
+                    {{-- Compare --}}
+                    <div class="mt-3" x-data="{ compareLoading: false }">
+                        <button type="button"
+                                @click="
+                                    compareLoading = true;
+                                    fetch('{{ route('compare.add', $product) }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                            'Accept': 'application/json'
+                                        }
+                                    })
+                                    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                                    .then(({ ok, data }) => {
+                                        compareLoading = false;
+                                        window.dispatchEvent(new CustomEvent('toast', {
+                                            detail: {
+                                                message: data.message || (ok ? 'Đã thêm vào danh sách so sánh!' : 'Không thể thêm vào so sánh.'),
+                                                type: ok ? 'success' : 'error'
+                                            }
+                                        }));
+                                    })
+                                    .catch(() => {
+                                        compareLoading = false;
+                                        window.dispatchEvent(new CustomEvent('toast', {
+                                            detail: { message: 'Có lỗi xảy ra, thử lại sau.', type: 'error' }
+                                        }));
+                                    })
+                                "
+                                :disabled="compareLoading"
+                                class="w-full border border-[#c9a9a6] text-[#b8847e] py-3 rounded-lg font-medium hover:bg-[#e8c4c4] transition-colors text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+                            <svg x-show="!compareLoading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <svg x-show="compareLoading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span x-text="compareLoading ? 'Đang thêm...' : 'Thêm vào so sánh'"></span>
+                        </button>
+                    </div>
+
                     {{-- Share --}}
                     @auth
                         <div class="mt-6 pt-5 border-t border-[#efe8e3]">
@@ -153,7 +195,7 @@
                 <div class="flex-1 w-full space-y-1.5">
                     @for($i = 5; $i >= 1; $i--)
                         @php
-                            $count = $product->reviews()->where('rating', $i)->count();
+                            $count = $product->reviews()->where('status', 'approved')->where('rating', $i)->count();
                             $percent = $product->reviews_count > 0 ? round(($count / $product->reviews_count) * 100) : 0;
                         @endphp
                         <div class="flex items-center gap-2 text-sm">

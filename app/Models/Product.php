@@ -17,9 +17,9 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'price'       => 'integer',
-            'sale_price'  => 'integer',
-            'stock'       => 'integer',
+            'price' => 'integer',
+            'sale_price' => 'integer',
+            'stock' => 'integer',
         ];
     }
 
@@ -93,16 +93,17 @@ class Product extends Model
     public function getImageUrlAttribute(): ?string
     {
         $img = $this->images()->where('is_primary', true)->first() ?? $this->images()->first();
+
         return $img ? asset($img->image_path) : null;
     }
 
     public function getAverageRatingAttribute(): float
     {
-        return round($this->reviews()->avg('rating') ?? 0, 1);
+        return round($this->reviews()->where('status', 'approved')->avg('rating') ?? 0, 1);
     }
 
     public function getReviewsCountAttribute(): int
     {
-        return $this->reviews()->count();
+        return $this->reviews()->where('status', 'approved')->count();
     }
 }
