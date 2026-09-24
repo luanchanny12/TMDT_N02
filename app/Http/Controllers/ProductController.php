@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -15,8 +15,8 @@ class ProductController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -28,7 +28,7 @@ class ProductController extends Controller
                     ->where('status', 'active')
                     ->where(function ($q) use ($category) {
                         $q->where('id', $category->id)
-                          ->orWhere('parent_id', $category->id);
+                            ->orWhere('parent_id', $category->id);
                     })
                     ->pluck('id');
 
@@ -101,10 +101,10 @@ class ProductController extends Controller
             ? Category::where('status', 'active')->find($category->parent_id)
             : null;
 
-        $metaTitle = $category->name . ' - SocialShop';
+        $metaTitle = $category->name.' - SocialShop';
         $metaDescription = $category->description
             ? Str::limit(strip_tags($category->description), 160)
-            : 'Mua sắm ' . $category->name . ' tại SocialShop — nhiều mẫu mã, giá tốt.';
+            : 'Mua sắm '.$category->name.' tại SocialShop — nhiều mẫu mã, giá tốt.';
 
         return view('categories.show', compact(
             'category', 'products', 'childCategories', 'parent',
@@ -126,25 +126,29 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        $reviews = $product->reviews()->with('user')->latest()->paginate(5);
+        $reviews = $product->reviews()
+            ->where('status', 'approved')
+            ->with('user')
+            ->latest()
+            ->paginate(5);
 
-        $canReview   = false;
+        $canReview = false;
         $hasReviewed = false;
 
         if (auth()->check()) {
             $user = auth()->user();
             $hasReviewed = $user->reviews()->where('product_id', $product->id)->exists();
 
-            if (!$hasReviewed) {
+            if (! $hasReviewed) {
                 $canReview = $user->orders()
                     ->whereHas('items', fn ($q) => $q->where('product_id', $product->id))
-                    ->where('status', 'completed')
+                    ->whereIn('status', ['delivered', 'completed'])
                     ->exists();
             }
         }
 
         // SEO Meta Tags
-        $metaTitle = $product->name . ' - SocialShop';
+        $metaTitle = $product->name.' - SocialShop';
         $metaDescription = Str::limit(strip_tags($product->description ?? $product->name), 160);
         $metaImage = $product->image_url ?? asset('images/og-image.jpg');
 
@@ -188,7 +192,7 @@ class ProductController extends Controller
      */
     private function categoryIdsWithDescendants(Category $category): array
     {
-        $ids   = [(int) $category->id];
+        $ids = [(int) $category->id];
         $queue = [(int) $category->id];
 
         while ($queue) {
@@ -200,7 +204,7 @@ class ProductController extends Controller
                 ->all();
 
             $queue = array_values(array_diff($children, $ids));
-            $ids   = array_merge($ids, $queue);
+            $ids = array_merge($ids, $queue);
         }
 
         return $ids;
