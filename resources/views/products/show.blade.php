@@ -1,4 +1,10 @@
-<x-layouts.app :title="$product->name">
+<x-layouts.app
+    :title="$product->name"
+    :meta-title="$metaTitle"
+    :meta-description="$metaDescription"
+    :meta-image="$metaImage"
+    :json-ld="$jsonLd"
+>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- Breadcrumb --}}

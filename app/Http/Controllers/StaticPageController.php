@@ -23,4 +23,14 @@ class StaticPageController extends Controller
     {
         return view('pages.faq');
     }
+
+    public function terms()
+    {
+        return view('pages.terms');
+    }
+
+    public function about()
+    {
+        return view('pages.about');
+    }
 }

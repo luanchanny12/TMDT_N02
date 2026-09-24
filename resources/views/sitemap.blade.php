@@ -56,6 +56,18 @@
         <priority>0.5</priority>
     </url>
     <url>
+        <loc>{{ url('/dieu-khoan-giao-dich') }}</loc>
+        <lastmod>{{ now()->format('Y-m-d') }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>{{ url('/gioi-thieu') }}</loc>
+        <lastmod>{{ now()->format('Y-m-d') }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
         <loc>{{ url('/faq') }}</loc>
         <lastmod>{{ now()->format('Y-m-d') }}</lastmod>
         <changefreq>monthly</changefreq>

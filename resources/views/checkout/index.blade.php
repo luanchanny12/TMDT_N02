@@ -159,7 +159,7 @@
                         </button>
                         <p class="text-xs text-gray-500 mt-3 text-center">
                             Bằng cách tiếp tục, bạn đồng ý với
-                            <a href="{{ route('pages.privacy') }}" class="underline hover:text-[#b8847e]">Điều kiện giao dịch chung</a>
+                            <a href="{{ route('pages.terms') }}" class="underline hover:text-[#b8847e]">Điều Kiện Giao Dịch</a>
                             và
                             <a href="{{ route('pages.privacy') }}" class="underline hover:text-[#b8847e]">Chính sách bảo mật</a>.
                         </p>

@@ -1,3 +1,11 @@
+@props([
+    'title' => null,
+    'metaTitle' => null,
+    'metaDescription' => null,
+    'metaImage' => null,
+    'metaKeywords' => null,
+    'jsonLd' => null,
+])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -362,6 +370,8 @@
                         Hỗ trợ
                     </h5>
                     <ul class="space-y-2 text-sm">
+                        <li><a href="{{ route('pages.terms') }}" class="hover:text-[#e8c4c4] transition-colors">Điều Kiện Giao Dịch</a></li>
+                        <li><a href="{{ route('pages.about') }}" class="hover:text-[#e8c4c4] transition-colors">Thông Tin Người Bán</a></li>
                         <li><a href="{{ route('pages.buying-guide') }}" class="hover:text-[#e8c4c4] transition-colors">Hướng dẫn mua hàng</a></li>
                         <li><a href="{{ route('pages.return-policy') }}" class="hover:text-[#e8c4c4] transition-colors">Chính sách đổi trả</a></li>
                         <li><a href="{{ route('pages.privacy') }}" class="hover:text-[#e8c4c4] transition-colors">Chính sách bảo mật</a></li>
