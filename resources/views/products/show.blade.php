@@ -153,7 +153,7 @@
                 <div class="flex-1 w-full space-y-1.5">
                     @for($i = 5; $i >= 1; $i--)
                         @php
-                            $count = $product->reviews()->where('rating', $i)->count();
+                            $count = $product->reviews()->where('status', 'approved')->where('rating', $i)->count();
                             $percent = $product->reviews_count > 0 ? round(($count / $product->reviews_count) * 100) : 0;
                         @endphp
                         <div class="flex items-center gap-2 text-sm">
